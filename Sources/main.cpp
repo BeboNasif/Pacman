@@ -2,7 +2,6 @@
 #include"Menu.h"
 #include "menu_Bg.h"
 
-int GameMode;
 Menu menu;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close | Style::Fullscreen);
 
