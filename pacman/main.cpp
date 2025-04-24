@@ -9,6 +9,5 @@ RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close | Style::Fulls
 int main()
 {
 	window.setFramerateLimit(120);
-	//MainMenu
 	menu.menu1(window);
 }
