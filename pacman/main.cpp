@@ -3,19 +3,10 @@
 #include "menu_Bg.h"
 #include "Player.h"
 
-//Menu menu;
-//RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close | Style::Fullscreen);
-
-
-int main()
-{
-	/*window.setFramerateLimit(120);
-	menu.menu1(window);*/
-    RenderWindow window(VideoMode(800, 600), "Pac-Man Test");
-    window.setFramerateLimit(60);
-
+Menu menu;
+RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close /*| Style::Fullscreen*/);
+void Gameplay() {
     Sprite pacmanSprite;
-
     Player pacman(pacmanSprite);
 
     RectangleShape ghostShape(Vector2f(40.f, 40.f));
@@ -23,31 +14,37 @@ int main()
     ghostShape.setPosition(200.f, 200.f);
 
     Clock clock;
-        while (window.isOpen()) {
-            float deltaTime = clock.restart().asSeconds();
-            Event event;
-            while (window.pollEvent(event)) {
-                if (event.type == Event::Closed)
-                    window.close();
-            }
-
-            if (!pacman.gameOver) {
-                pacman.setDeltaTime(deltaTime);
-                pacman.handleInput();
-                pacman.updateMovement();
-                pacman.updateAnimation();
-                pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
-                if (pacmanSprite.getGlobalBounds().intersects(ghostShape.getGlobalBounds())) {
-                    pacman.die();
-                }
-            }
-
-            window.clear();
-            window.draw(pacmanSprite);
-            window.draw(ghostShape);
-            window.display();
+    while (window.isOpen()) {
+        float deltaTime = clock.restart().asSeconds();
+        Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed)
+                window.close();
+            if(event.key.code == Keyboard::Escape)
+				return;
         }
-    
-    return 0;
 
+        if (!pacman.gameOver) {
+            pacman.setDeltaTime(deltaTime);
+            pacman.handleInput();
+            pacman.updateMovement();
+            pacman.updateAnimation();
+            pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
+            if (pacmanSprite.getGlobalBounds().intersects(ghostShape.getGlobalBounds())) {
+                pacman.die();
+            }
+        }
+
+        window.clear();
+        window.draw(pacmanSprite);
+        window.draw(ghostShape);
+        window.display();
+    }
+}
+
+int main()
+{
+	window.setFramerateLimit(120);
+	menu.menu1(window);
+   
 }

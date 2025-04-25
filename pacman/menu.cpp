@@ -6,6 +6,7 @@ menu_Bg menu_UI;
 
 bool pressed = true;
 bool esc_button = true;
+void Gameplay();
 
 Menu::Menu()
 {
@@ -135,8 +136,10 @@ void Menu::menu1(RenderWindow& window)
                     if (event.key.code == Keyboard::Enter || (event.key.code == Keyboard::Escape && selected == 6))
                     {
                         esc_button = 1;
-                        if (selected == 6)
-                            pageNumber = -1;
+                        if (selected == 0)
+                            Gameplay();
+                       	if (selected == 6)
+								pageNumber = -1;
 
                         
                     }
