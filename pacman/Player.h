@@ -15,8 +15,8 @@ private:
     int ImageCounter ;
     int maximagecounter;
     float AnimationCounter ;
+    bool animation_running ;
     int live;
-    bool isDead ;
     State curr_state ;
     
 
@@ -24,7 +24,9 @@ private:
     vector <Texture> wAnimation, sAnimation, aAnimation, dAnimation, DeathAnimation;
 
 public:
+    Vector2f frozenPosition;
     bool gameOver = false;
+    bool isDead;
     Player(Sprite& p);
     void setDeltaTime(float dt);
     void handleInput();
