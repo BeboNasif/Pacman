@@ -1,4 +1,4 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include "include.h"
 
 using namespace sf;
@@ -12,6 +12,7 @@ Player::Player(Sprite& p) : player(p) {
     player.setPosition(initial_position);
     Idle.loadFromFile("Assets/Textures/pacman/neutral.png");
     live = 3;
+    animation_running = false;
     isDead = false;
     ImageCounter = 0;
     maximagecounter = 0;
@@ -37,6 +38,7 @@ void Player::setDeltaTime(float dt) {
 }
 
 void Player::handleInput() {
+    if (!animation_running) {
         if (Keyboard::isKeyPressed(Keyboard::A))
             curr_state = amove;
         else if (Keyboard::isKeyPressed(Keyboard::D))
@@ -45,17 +47,19 @@ void Player::handleInput() {
             curr_state = smove;
         else if (Keyboard::isKeyPressed(Keyboard::W))
             curr_state = wmove;
+       
+    }
     
 }
 void Player::updateMovement() {
     velocity = { 0.f, 0.f };
-
-    switch (curr_state) {
-    case wmove: velocity.y = -walk_speed * playerdeltatime; break;
-    case smove: velocity.y = walk_speed * playerdeltatime; break;
-    case amove: velocity.x = -walk_speed * playerdeltatime; break;
-    case dmove: velocity.x = walk_speed * playerdeltatime; break;
-    case idle: break;
+    
+    switch(curr_state) {
+            case wmove: velocity.y = -walk_speed * playerdeltatime; break;
+            case smove: velocity.y = walk_speed * playerdeltatime; break;
+            case amove: velocity.x = -walk_speed * playerdeltatime; break;
+            case dmove: velocity.x = walk_speed * playerdeltatime; break;
+            default: break;
     }
 
     player.move(velocity);
@@ -107,7 +111,6 @@ void Player::updateAnimationCounter(float speedThreshold) {
                 else {
                     cout << "Game Over"<<endl;
                     gameOver = true;
-                    resetAfterDeath();
                     return ;
                 }
             }
@@ -116,8 +119,9 @@ void Player::updateAnimationCounter(float speedThreshold) {
     }
 }
 void Player::die() {
-    if (!isDead ) {
+    if (!isDead && !animation_running) {
         curr_state = dead;
+        animation_running = true;
         ImageCounter = 0;
         AnimationCounter = 0;
         isDead = true;
@@ -126,6 +130,7 @@ void Player::die() {
 
 void Player::resetAfterDeath() {
     isDead = false;
+    animation_running = false;
     curr_state = idle;
     ImageCounter = 0;
     AnimationCounter = 0;

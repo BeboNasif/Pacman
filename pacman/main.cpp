@@ -24,16 +24,16 @@ void Gameplay() {
 				return;
         }
 
-        if (!pacman.gameOver) {
-            pacman.setDeltaTime(deltaTime);
-            pacman.handleInput();
-            pacman.updateMovement();
-            pacman.updateAnimation();
-            pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
-            if (pacmanSprite.getGlobalBounds().intersects(ghostShape.getGlobalBounds())) {
-                pacman.die();
+            if (!pacman.gameOver) {
+                pacman.setDeltaTime(deltaTime);
+                pacman.handleInput();
+                pacman.updateMovement();
+                pacman.updateAnimation();
+                pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
+                if (pacmanSprite.getGlobalBounds().intersects(ghostShape.getGlobalBounds())) {
+                    pacman.die();
+                }
             }
-        }
 
         window.clear();
         window.draw(pacmanSprite);
