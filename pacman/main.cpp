@@ -36,7 +36,7 @@ int main()
                 pacman.handleInput();
                 pacman.updateMovement();
                 pacman.updateAnimation();
-
+                pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
                 if (pacmanSprite.getGlobalBounds().intersects(ghostShape.getGlobalBounds())) {
                     pacman.die();
                 }
