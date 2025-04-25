@@ -39,13 +39,13 @@ void Player::setDeltaTime(float dt) {
 
 void Player::handleInput() {
     if (!animation_running) {
-        if (Keyboard::isKeyPressed(Keyboard::A))
+        if (Keyboard::isKeyPressed(Keyboard::A)|| Keyboard::isKeyPressed(Keyboard::Left))
             curr_state = amove;
-        else if (Keyboard::isKeyPressed(Keyboard::D))
+        else if (Keyboard::isKeyPressed(Keyboard::D)|| Keyboard::isKeyPressed(Keyboard::Right))
             curr_state = dmove;
-        else if (Keyboard::isKeyPressed(Keyboard::S))
+        else if (Keyboard::isKeyPressed(Keyboard::S)|| Keyboard::isKeyPressed(Keyboard::Down))
             curr_state = smove;
-        else if (Keyboard::isKeyPressed(Keyboard::W))
+        else if (Keyboard::isKeyPressed(Keyboard::W)|| Keyboard::isKeyPressed(Keyboard::Up))
             curr_state = wmove;
        
     }
