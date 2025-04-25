@@ -137,9 +137,12 @@ void Menu::menu1(RenderWindow& window)
                     {
                         esc_button = 1;
                         if (selected == 0)
+                        {
                             Gameplay();
+							Face_intilization();
+                        }
                        	if (selected == 6)
-								pageNumber = -1;
+							pageNumber = -1;
 
                         
                     }

@@ -5,7 +5,7 @@ using namespace sf;
 Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
-    player_scale = 1.5;
+    player_scale = 2.5;
     initial_position = { 100,100 };
     State curr_state = idle;
     player.setScale(player_scale, player_scale);

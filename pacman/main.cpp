@@ -7,6 +7,7 @@ Menu menu;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close /*| Style::Fullscreen*/);
 void Gameplay() {
     Sprite pacmanSprite;
+
     Player pacman(pacmanSprite);
 
     RectangleShape ghostShape(Vector2f(40.f, 40.f));
@@ -20,20 +21,22 @@ void Gameplay() {
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
-            if(event.key.code == Keyboard::Escape)
-				return;
+            if (event.key.code == Keyboard::Escape)
+                return;
         }
 
-            if (!pacman.gameOver) {
-                pacman.setDeltaTime(deltaTime);
-                pacman.handleInput();
-                pacman.updateMovement();
-                pacman.updateAnimation();
-                pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
-                if (pacmanSprite.getGlobalBounds().intersects(ghostShape.getGlobalBounds())) {
-                    pacman.die();
-                }
+        if (!pacman.gameOver) {
+            pacman.setDeltaTime(deltaTime);
+            pacman.handleInput();
+            pacman.updateMovement();
+            pacman.updateAnimation();
+            pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
+            if (ghostShape.getGlobalBounds().intersects(pacmanSprite.getGlobalBounds())) {
+
+                pacman.die();
+
             }
+        }
 
         window.clear();
         window.draw(pacmanSprite);
@@ -44,7 +47,6 @@ void Gameplay() {
 
 int main()
 {
-	window.setFramerateLimit(120);
-	menu.menu1(window);
-   
+    window.setFramerateLimit(120);
+    menu.menu1(window);
 }
