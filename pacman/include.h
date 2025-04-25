@@ -8,5 +8,6 @@
 #include <string.h>
 #include <vector>
 #include <math.h>
+
 using namespace sf;
 using namespace std;
