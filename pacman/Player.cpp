@@ -18,19 +18,22 @@ Player::Player(Sprite& p) : player(p) {
     maximagecounter = 0;
     AnimationCounter = 0;
 
-    wAnimation.resize(2);
-    sAnimation.resize(2);
-    aAnimation.resize(2);
-    dAnimation.resize(2);
-    DeathAnimation.resize(11);
+
+    animationTextures[wmove] = vector<Texture>(2);
+    animationTextures[smove] = vector<Texture>(2);
+    animationTextures[amove] = vector<Texture>(2);
+    animationTextures[dmove] = vector<Texture>(2);
+    animationTextures[dead] = vector<Texture>(11);
+   
     for (int i = 0; i < 2; i++) {
-        wAnimation[i].loadFromFile("Assets/Textures/pacman/up_" + to_string(i) + ".png");
-        sAnimation[i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + ".png");
-        aAnimation[i].loadFromFile("Assets/Textures/pacman/left_" + to_string(i) + ".png");
-        dAnimation[i].loadFromFile("Assets/Textures/pacman/right_" + to_string(i) + ".png");
+        animationTextures[wmove][i].loadFromFile("Assets/Textures/pacman/up_" + to_string(i) + ".png");
+        animationTextures[smove][i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + ".png");
+        animationTextures[amove][i].loadFromFile("Assets/Textures/pacman/left_" + to_string(i) + ".png");
+        animationTextures[dmove][i].loadFromFile("Assets/Textures/pacman/right_" + to_string(i) + ".png");
     }
-    for (int i = 0; i < 11; i++)
-        DeathAnimation[i].loadFromFile("Assets/Textures/pacman/d-" + to_string(i) + ".png");
+    for (int i = 0; i < 11; i++) {
+        animationTextures[dead][i].loadFromFile("Assets/Textures/pacman/d-" + to_string(i) + ".png");
+    }
 }
 
 void Player::setDeltaTime(float dt) {
@@ -85,12 +88,40 @@ void Player::updatePlace(Vector2f window) {
 }
 void Player::updateAnimation() {
     switch (curr_state) {
-    case idle:  player.setTexture(Idle); ImageCounter = 0; break;
-    case wmove: maximagecounter = 2; player.setTexture(wAnimation[ImageCounter]); updateAnimationCounter(0.08f); break;
-    case dmove: maximagecounter = 2; player.setTexture(dAnimation[ImageCounter]); updateAnimationCounter(0.09f); break;
-    case smove: maximagecounter = 2; player.setTexture(sAnimation[ImageCounter]); updateAnimationCounter(0.08f); break;
-    case amove: maximagecounter = 2; player.setTexture(aAnimation[ImageCounter]); updateAnimationCounter(0.09f); break;
-    case dead:  maximagecounter = 11; player.setTexture(DeathAnimation[ImageCounter]); updateAnimationCounter(0.07f); break;
+    case idle:
+        player.setTexture(Idle);
+        ImageCounter = 0;
+        break;
+
+    case wmove:
+        maximagecounter = animationTextures[wmove].size();
+        player.setTexture(animationTextures[wmove][ImageCounter]);
+        updateAnimationCounter(0.08f);
+        break;
+
+    case smove:
+        maximagecounter = animationTextures[smove].size();
+        player.setTexture(animationTextures[smove][ImageCounter]);
+        updateAnimationCounter(0.08f);
+        break;
+
+    case amove:
+        maximagecounter = animationTextures[amove].size();
+        player.setTexture(animationTextures[amove][ImageCounter]);
+        updateAnimationCounter(0.09f);
+        break;
+
+    case dmove:
+        maximagecounter = animationTextures[dmove].size();
+        player.setTexture(animationTextures[dmove][ImageCounter]);
+        updateAnimationCounter(0.09f);
+        break;
+
+    case dead:
+        maximagecounter = animationTextures[dead].size();
+        player.setTexture(animationTextures[dead][ImageCounter]);
+        updateAnimationCounter(0.07f);
+        break;
     }
 }
 

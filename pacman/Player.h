@@ -1,5 +1,6 @@
 #pragma once
 #include "include.h"
+#include <unordered_map>
 
 class Player
 {
@@ -21,7 +22,7 @@ private:
     
 
     Texture Idle;
-    vector <Texture> wAnimation, sAnimation, aAnimation, dAnimation, DeathAnimation;
+    unordered_map<State, vector<Texture>> animationTextures;
 
 public:
     Vector2f frozenPosition;
