@@ -17,8 +17,6 @@ Player::Player(Sprite& p) : player(p) {
     ImageCounter = 0;
     maximagecounter = 0;
     AnimationCounter = 0;
-
-
     animationTextures[wmove] = vector<Texture>(2);
     animationTextures[smove] = vector<Texture>(2);
     animationTextures[amove] = vector<Texture>(2);
@@ -58,11 +56,16 @@ void Player::updateMovement() {
     velocity = { 0.f, 0.f };
     
     switch(curr_state) {
-            case wmove: velocity.y = -walk_speed * playerdeltatime; break;
-            case smove: velocity.y = walk_speed * playerdeltatime; break;
-            case amove: velocity.x = -walk_speed * playerdeltatime; break;
-            case dmove: velocity.x = walk_speed * playerdeltatime; break;
-            default: break;
+            case wmove: velocity.y = -walk_speed * playerdeltatime; 
+                break;
+            case smove: velocity.y = walk_speed * playerdeltatime;
+                break;
+            case amove: velocity.x = -walk_speed * playerdeltatime;
+                break;
+            case dmove: velocity.x = walk_speed * playerdeltatime;
+                break;
+            default: 
+                break;
     }
 
     player.move(velocity);
@@ -87,42 +90,22 @@ void Player::updatePlace(Vector2f window) {
 
 }
 void Player::updateAnimation() {
-    switch (curr_state) {
-    case idle:
+    if (curr_state == idle) {
         player.setTexture(Idle);
         ImageCounter = 0;
-        break;
-
-    case wmove:
-        maximagecounter = animationTextures[wmove].size();
-        player.setTexture(animationTextures[wmove][ImageCounter]);
-        updateAnimationCounter(0.08f);
-        break;
-
-    case smove:
-        maximagecounter = animationTextures[smove].size();
-        player.setTexture(animationTextures[smove][ImageCounter]);
-        updateAnimationCounter(0.08f);
-        break;
-
-    case amove:
-        maximagecounter = animationTextures[amove].size();
-        player.setTexture(animationTextures[amove][ImageCounter]);
-        updateAnimationCounter(0.09f);
-        break;
-
-    case dmove:
-        maximagecounter = animationTextures[dmove].size();
-        player.setTexture(animationTextures[dmove][ImageCounter]);
-        updateAnimationCounter(0.09f);
-        break;
-
-    case dead:
-        maximagecounter = animationTextures[dead].size();
-        player.setTexture(animationTextures[dead][ImageCounter]);
-        updateAnimationCounter(0.07f);
-        break;
     }
+    else {
+        maximagecounter = animationTextures[curr_state].size();
+
+        player.setTexture(animationTextures[curr_state][ImageCounter]);
+
+        if (curr_state == dead)
+            updateAnimationCounter(0.07f);
+        else
+            updateAnimationCounter(0.08f);
+    }
+
+    
 }
 
 
