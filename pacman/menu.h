@@ -1,45 +1,50 @@
+// Menu.h
 #pragma once
+
 #include "include.h"
 
-class Menu
-{
+class Menu {
 public:
-	int choises;
-	int pageNumber = 1000;
-	int shift = 60;
-	vector<Text> mainmenu;
-	Texture pill;
-	vector<RectangleShape> pills;
-	int selected = 0;
-	Font font;
-	int height = 1080;
-	int positionOfFace = 60;
-	int x = 40;
-	RectangleShape DownFace;
-	vector<bool> pillConsumed;
-	int eatenPills = 0;
-	Clock deltaClock;
-	float downFaceSpeed = 80.f;
-	Clock resetDelayClock;
-	bool delayStarted = false;
-	vector<Clock> pillTimers;
-	vector<bool> pillDelayStarted;
-
-	RectangleShape Face;
-	vector<Texture> faceFrames;
-	int currentFrame = 0;
-	Clock animationClock;
-	Time frameDuration;
-
-
-	Menu();
-	void Face_intilization();
-	void MoveDown(int& selected, int choises);
-	void MoveUp(int& selected, int choises);
-	void menu1(RenderWindow& window);
-};
-
-	/*void Play_menu(RenderWindow& window, int& GameMode);
+    Menu();
+    void menu1(RenderWindow& window);
+    void Play_menu(RenderWindow& window);
+	void sound_options(RenderWindow& window);
 	void options_menu(RenderWindow& window);
 	void credits(RenderWindow& window);
-	void instructions(RenderWindow& window);*/
+	void instructions(RenderWindow& window);
+
+private:
+    void updateFaces(float dt);
+    void Face_intilization();
+    void MoveDown(int& sel, int choices);
+    void MoveUp(int& sel, int choices);
+
+    // ——— Menu text items ———
+    vector<Text> mainmenu;
+    int choises;
+    int selected;
+    Font font;
+
+    // ——— Face & animation ———
+    vector<Texture> faceFrames;
+    RectangleShape Face, DownFace;
+    float downFaceSpeed;
+    int currentFrame;
+    Clock animationClock;
+    Time frameDuration;
+
+    // ——— Pill logic ———
+    vector<RectangleShape> pills;
+    Texture pill;
+    vector<bool> pillConsumed;
+    vector<bool> pillDelayStarted;
+    vector<Clock> pillTimers;
+    Clock resetDelayClock;
+    int eatenPills;
+    bool delayStarted;
+
+    // ——— Timing & layout ———
+    Clock deltaClock;
+    float positionOfFace;
+    int pageNumber;
+};

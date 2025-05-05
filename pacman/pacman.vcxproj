@@ -23,12 +23,14 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="menu_Bg.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Sounds.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="menu_Bg.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Sounds.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

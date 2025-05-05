@@ -2,9 +2,12 @@
 #include"Menu.h"
 #include "menu_Bg.h"
 #include "Player.h"
+#include "Sounds.h"
+
 
 Menu menu;
-RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close /*| Style::Fullscreen*/);
+Sounds sound;
+RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close | Style::Fullscreen);
 void Gameplay() {
     Sprite pacmanSprite;
 
