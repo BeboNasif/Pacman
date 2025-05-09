@@ -345,11 +345,11 @@ void Menu::sound_options(RenderWindow& window)
     }
 
     RectangleShape barSound({ P_M_Sound * 3.f, 40.f });
-    barSound.setFillColor({ 180,3,3 });
+    barSound.setFillColor({ 255, 255, 0 });
     barSound.setPosition(1005, midY + 1 * menu6.positionOfFace);
 
     RectangleShape barMusic({ P_M_Music * 3.f, 40.f });
-    barMusic.setFillColor({ 180,3,3 });
+    barMusic.setFillColor({ 255, 255, 0 });
     barMusic.setPosition(1005, midY + 2 * menu6.positionOfFace);
 
     menu6.deltaClock.restart();
