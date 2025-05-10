@@ -6,7 +6,8 @@ Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
     player_scale = 2.0;
-    initial_position = {1920/2 - 22 , 785 + 10};
+    reachedNode = 1;
+    initial_position = { 880+ 20,789 + 20};
     State curr_state = idle;
     player.setScale(player_scale, player_scale);
     player.setPosition(initial_position);
@@ -40,7 +41,9 @@ void Player::setDeltaTime(float dt) {
     playerdeltatime = dt;
 }
 
-void Player::handleInput() {
+
+void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
+
     if (!animation_running) {
         if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) {
             cur_dir = left;
@@ -58,36 +61,57 @@ void Player::handleInput() {
             cur_dir = up;
             curr_state = wmove;
         }
-       
-    }   
+        /*else {
+            curr_state = idle;
+        }*/
+
+        for (int i = 1; i <= 64; i++) {
+            if (player.getGlobalBounds().intersects(nodes[i].getGlobalBounds())) {
+                cout << i << "\t\t\t";
+                cur_node = i;
+                cout << "A7A\n";
+            }
+
+        }
+
+    }
 }
 
-void Player::updateMovement() {
-    velocity = { 0.f, 0.f };
-    
-    switch(curr_state) {
-            case wmove: velocity.y = -walk_speed * playerdeltatime; 
+
+
+
+void Player::updateMovement(vector<pair<int,int>> &pos) {
+    //velocity = { 0,0 };
+
+
+    for (int i = 1; i <= 64; i++) {
+        if (abs(pos[i].first - player.getPosition().x) < 3 and abs(pos[i].second- player.getPosition().y) < 3) {
+            switch (curr_state) {
+                case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; 
                 break;
-            case smove: velocity.y = walk_speed * playerdeltatime;
+            case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0;
                 break;
-            case amove: velocity.x = -walk_speed * playerdeltatime;
+            case amove: velocity.x = -walk_speed * playerdeltatime ,velocity.y = 0;
                 break;
-            case dmove: velocity.x = walk_speed * playerdeltatime;
+            case dmove: velocity.x = walk_speed * playerdeltatime, velocity.y = 0;
                 break;
             default: 
-                break;
+                break;  
+            }
+        }
     }
+    
 
-    player.move(velocity);
+     player.move(velocity);
 }
 
 void Player::updatePlace(Vector2f window) {
 
-    if (player.getPosition().x > window.x) {
-        player.setPosition(0, player.getPosition().y);
+    if (player.getPosition().x > 1475) {
+        player.setPosition(400, player.getPosition().y);
     }
-    else if (player.getPosition().x < 0) {
-        player.setPosition(window.x, player.getPosition().y);
+    else if (player.getPosition().x < 400) {
+        player.setPosition(1475, player.getPosition().y);
     }
 
     if (player.getPosition().y > window.y) {

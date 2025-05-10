@@ -18,23 +18,28 @@ private:
     float AnimationCounter ;
     bool animation_running ;
     int live;
-    State curr_state ;
-    int cur_node;
-    enum Dir { up, down, right, left };
-    Dir cur_dir;
+   
+   
     
 
     Texture Idle;
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
+    CircleShape nodes[70];
+    enum Dir { up, down, right, left };
+    Dir cur_dir;
     Vector2f frozenPosition;
     bool gameOver = false;
+    State curr_state;
+    int cur_node;
+    int next_node;
     bool isDead;
+    bool reachedNode;
     Player(Sprite& p);
     void setDeltaTime(float dt);
-    void handleInput();
-    void updateMovement();
+    void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos);
+    void updateMovement(vector<pair<int, int>>& pos);
     void updatePlace(Vector2f window);
     void updateAnimation();
     void die();

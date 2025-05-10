@@ -1,5 +1,6 @@
 #include "Map.h"
-
+#include "include.h"
+using namespace sf;
 void Map::addEdge(int u, int v) {
     adjList[u].push_back(v);
     adjList[v].push_back(u);
@@ -16,12 +17,11 @@ void Map::printAdjList() {
 }
 
 void Map::init() {
-    pos = vector<pair<int, int>>(70);
     for (auto [u, v] : edges) {
         addEdge(u, v);
     }
 }
 
-pair<int, int> Map::getPos(int u) {
+pair<int, int> Map::getPos(int &u) {
     return pos[u];
 }
