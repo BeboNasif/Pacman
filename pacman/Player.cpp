@@ -5,8 +5,8 @@ using namespace sf;
 Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
-    player_scale = 2.5;
-    initial_position = { 100,100 };
+    player_scale = 2.0;
+    initial_position = {1920/2 - 22 , 785 + 10};
     State curr_state = idle;
     player.setScale(player_scale, player_scale);
     player.setPosition(initial_position);
@@ -17,6 +17,8 @@ Player::Player(Sprite& p) : player(p) {
     ImageCounter = 0;
     maximagecounter = 0;
     AnimationCounter = 0;
+    cur_dir = left;
+    cur_node = 45;
     animationTextures[wmove] = vector<Texture>(2);
     animationTextures[smove] = vector<Texture>(2);
     animationTextures[amove] = vector<Texture>(2);
@@ -40,18 +42,26 @@ void Player::setDeltaTime(float dt) {
 
 void Player::handleInput() {
     if (!animation_running) {
-        if (Keyboard::isKeyPressed(Keyboard::A)|| Keyboard::isKeyPressed(Keyboard::Left))
+        if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) {
+            cur_dir = left;
             curr_state = amove;
-        else if (Keyboard::isKeyPressed(Keyboard::D)|| Keyboard::isKeyPressed(Keyboard::Right))
+        }
+        else if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) {
+            cur_dir = right;
             curr_state = dmove;
-        else if (Keyboard::isKeyPressed(Keyboard::S)|| Keyboard::isKeyPressed(Keyboard::Down))
+        }
+        else if (Keyboard::isKeyPressed(Keyboard::S) || Keyboard::isKeyPressed(Keyboard::Down)) {
+            cur_dir = down;
             curr_state = smove;
-        else if (Keyboard::isKeyPressed(Keyboard::W)|| Keyboard::isKeyPressed(Keyboard::Up))
+        }
+        else if (Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Up)) {
+            cur_dir = up;
             curr_state = wmove;
+        }
        
-    }
-    
+    }   
 }
+
 void Player::updateMovement() {
     velocity = { 0.f, 0.f };
     

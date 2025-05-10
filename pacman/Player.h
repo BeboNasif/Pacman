@@ -19,6 +19,9 @@ private:
     bool animation_running ;
     int live;
     State curr_state ;
+    int cur_node;
+    enum Dir { up, down, right, left };
+    Dir cur_dir;
     
 
     Texture Idle;
@@ -35,8 +38,7 @@ public:
     void updatePlace(Vector2f window);
     void updateAnimation();
     void die();
-    
-
+  
 private:
     void resetAfterDeath();
     void updateAnimationCounter(float speedThreshold);

@@ -18,12 +18,12 @@ void Sounds::music(int n) {
 	/*else if (n == 1)
 		bgmusic.openFromFile("Assets//Sounds//gameplay music.ogg");*/
 	bgmusic.setLoop(true);
-	bgmusic.play();
+	//bgmusic.play();
 
 }
 void Sounds::change_option_Sound() {
 
 	LoadMusic(1);
 	so.setBuffer(buf1);
-	so.play();
+	//so.play();
 }

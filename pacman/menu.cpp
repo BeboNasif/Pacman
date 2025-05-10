@@ -278,8 +278,7 @@ void Menu::Play_menu(RenderWindow& window)
             if (evt.type == Event::KeyPressed && !pressed) {
                 pressed = true;
 
-                if ((evt.key.code == Keyboard::Enter && menu2.selected == 2)
-                    || (evt.key.code == Keyboard::Escape && menu2.selected == 2))
+                if ((evt.key.code == Keyboard::Enter && menu2.selected == 2) || (evt.key.code == Keyboard::Escape && menu2.selected == 2))
                 {
                     return;
                 }
@@ -295,7 +294,7 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.MoveUp(menu2.selected, 3);
 
                 if (evt.key.code == Keyboard::Enter) {
-                    if (menu2.selected == 0)      Gameplay();
+                    if (menu2.selected == 0) Gameplay();
                     else if (menu2.selected == 1) Gameplay();
                 }
             }
