@@ -8,11 +8,11 @@ void Map::addEdge(int u, int v) {
 
 void Map::printAdjList() {
     for (const auto& [node, neighbors] : adjList) {
-        cout << node << ": ";
+        //cout << node << ": ";
         for (int neighbor : neighbors) {
-            cout << neighbor << " ";
+           // cout << neighbor << " ";
         }
-        cout << "\n";
+        //cout << "\n";
     }
 }
 

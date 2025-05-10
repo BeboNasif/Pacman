@@ -43,7 +43,8 @@ public:
     void updatePlace(Vector2f window);
     void updateAnimation();
     void die();
-  
+    int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition);
+
 private:
     void resetAfterDeath();
     void updateAnimationCounter(float speedThreshold);

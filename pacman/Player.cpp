@@ -43,7 +43,6 @@ void Player::setDeltaTime(float dt) {
 
 
 void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-
     if (!animation_running) {
         if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) {
             cur_dir = left;
@@ -61,19 +60,9 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
             cur_dir = up;
             curr_state = wmove;
         }
-        /*else {
-            curr_state = idle;
-        }*/
 
-        for (int i = 1; i <= 64; i++) {
-            if (player.getGlobalBounds().intersects(nodes[i].getGlobalBounds())) {
-                cout << i << "\t\t\t";
-                cur_node = i;
-                cout << "A7A\n";
-            }
-
-        }
-
+        // Update the current node based on the player's position
+        cur_node = getCurrentNode(pos, player.getPosition());
     }
 }
 
@@ -186,4 +175,16 @@ void Player::resetAfterDeath() {
     player.setPosition(initial_position);
 }
 
+int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition) {
+    int closestNode = -1;
+    float minDistance = FLT_MAX;
 
+    for (int i = 1; i <= 64; i++) {
+        float distance = sqrt(pow(pos[i].first - playerPosition.x, 2) + pow(pos[i].second - playerPosition.y, 2));
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestNode = i;
+        }
+    }
+    return closestNode;
+}
