@@ -9,7 +9,7 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman");
+RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close | Style::Fullscreen);
 CircleShape a7a;
 
 void Gameplay() {

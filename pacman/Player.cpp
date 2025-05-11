@@ -2,6 +2,12 @@
 #include "include.h"
 
 using namespace sf;
+
+Keyboard::Key moveLeftKey = Keyboard::Left;
+Keyboard::Key moveRightKey = Keyboard::Right;
+Keyboard::Key moveUpkey = Keyboard::Up;
+Keyboard::Key moveDownkey = Keyboard::Down;
+
 Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
@@ -44,19 +50,19 @@ void Player::setDeltaTime(float dt) {
 
 void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
     if (!animation_running) {
-        if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) {
+        if (Keyboard::isKeyPressed(moveLeftKey)) {
             cur_dir = left;
             curr_state = amove;
         }
-        else if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) {
+        else if (Keyboard::isKeyPressed(moveRightKey)) {
             cur_dir = right;
             curr_state = dmove;
         }
-        else if (Keyboard::isKeyPressed(Keyboard::S) || Keyboard::isKeyPressed(Keyboard::Down)) {
+        else if (Keyboard::isKeyPressed(moveDownkey)) {
             cur_dir = down;
             curr_state = smove;
         }
-        else if (Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Up)) {
+        else if (Keyboard::isKeyPressed(moveUpkey)) {
             cur_dir = up;
             curr_state = wmove;
         }
