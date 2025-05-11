@@ -9,7 +9,9 @@ public:
     void menu1(RenderWindow& window);
     void Play_menu(RenderWindow& window);
 	void sound_options(RenderWindow& window);
-	void options_menu(RenderWindow& window);
+    void player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey);
+    void control_menu(RenderWindow& window);
+    void options_menu(RenderWindow& window);
 	void credits(RenderWindow& window);
 	void instructions(RenderWindow& window);
 
@@ -18,6 +20,8 @@ private:
     void Face_intilization();
     void MoveDown(int& sel, int choices);
     void MoveUp(int& sel, int choices);
+    void changeKeyMapping(int& action, Keyboard::Key newKey, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey, Menu& menu9);
+    string keyboardKeyToString(sf::Keyboard::Key key);
 
     // ——— Menu text items ———
     vector<Text> mainmenu;

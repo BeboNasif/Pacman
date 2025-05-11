@@ -1,20 +1,30 @@
 #pragma once
-#include "include.h"
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <unordered_map>
 
-class Ghost
-{
-public:
-    Ghost(sf::Texture& texture, sf::Vector2f startPos);
+using namespace sf;
+using namespace std;
 
-    void draw(sf::RenderWindow& window);
-    void setPosition(sf::Vector2f pos);
-    sf::Vector2f getPosition() const;
-
-    static std::unordered_map<int, std::unordered_map<int, std::vector<int>>> precomputeAllPaths(std::unordered_map<int, std::vector<int>>& adjList);
-
-    // Method for moving the ghost along a path
-    void moveAlongPath(float deltaTime, const std::vector<int>& path, int& pathIndex, float ghostSpeed, const std::unordered_map<int, sf::Vector2f>& nodes);
-
+class Ghost {
 private:
+    sf::Texture texture;
     sf::Sprite sprite;
+    float speed;
+    int currentNode;
+    float elapsedTime;
+    int pathIndex;
+    std::vector<int> path;
+    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> allPaths;
+
+public:
+    Ghost(int startNode, const std::string& texturePath, const std::unordered_map<int, std::vector<int>>& adjList, const std::vector<std::pair<int, int>>& pos);
+    void update(float deltaTime, const std::unordered_map<int, std::vector<int>>& adjList, const std::vector<std::pair<int, int>>& pos, int pacmanNode);
+    void draw(sf::RenderWindow& window);
+    int getCurrentNode() const;
+    static std::unordered_map<int, std::unordered_map<int, std::vector<int>>> precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjList);
+    const sf::Sprite& getSprite() const;
 };
+
+
+

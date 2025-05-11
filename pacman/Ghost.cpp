@@ -1,38 +1,102 @@
 #include "Ghost.h"
-#include "include.h"
+#include <cmath>
 #include <queue>
-#include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <algorithm>
-#include <SFML/Graphics.hpp>
 
-// Precompute paths from all nodes to all other nodes using BFS
-std::unordered_map<int, std::unordered_map<int, std::vector<int>>> Ghost::precomputeAllPaths(std::unordered_map<int, std::vector<int>>& adjList)
+Ghost::Ghost(int startNode, const std::string& texturePath,
+    const std::unordered_map<int, std::vector<int>>& adjList,
+    const std::vector<std::pair<int, int>>& pos)
+{
+    texture.loadFromFile(texturePath);
+    sprite.setTexture(texture);
+    sprite.setOrigin(11, 11);
+    sprite.setScale(2.7f, 2.7f);
+    currentNode = startNode;
+    pathIndex = 0;
+    elapsedTime = 0;
+    speed = 100.0f;
+
+    sprite.setPosition(pos[startNode].first, pos[startNode].second);
+
+    allPaths = precomputeAllPaths(adjList);
+}
+
+void Ghost::update(float deltaTime,
+    const std::unordered_map<int, std::vector<int>>& adjList,
+    const std::vector<std::pair<int, int>>& pos,
+    int pacmanNode)
+{
+    if (path.empty()) {
+        if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
+            path = allPaths[currentNode][pacmanNode];
+            pathIndex = 0;
+        }
+    }
+
+    if (pathIndex + 1 < path.size()) {
+        int nextNode = path[pathIndex + 1];
+        if (nextNode >= 0 && nextNode < (int)pos.size()) {
+            Vector2f currentPos = sprite.getPosition();
+            Vector2f targetPos(pos[nextNode].first, pos[nextNode].second);
+
+            Vector2f dir = targetPos - currentPos;
+            float distance = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+
+            if (distance < speed * deltaTime) {
+                sprite.setPosition(targetPos);
+                currentNode = nextNode;
+                pathIndex++;
+
+                if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
+                    path = allPaths[currentNode][pacmanNode];
+                    pathIndex = 0;
+                }
+            }
+            else {
+                dir /= distance;
+                sprite.move(dir * speed * deltaTime);
+            }
+        }
+    }
+    else {
+        // Path ended - recalc
+        if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
+            path = allPaths[currentNode][pacmanNode];
+            pathIndex = 0;
+        }
+    }
+}
+
+
+void Ghost::draw(sf::RenderWindow& window) {
+    window.draw(sprite);
+}
+
+int Ghost::getCurrentNode() const {
+    return currentNode;
+}
+
+std::unordered_map<int, std::unordered_map<int, std::vector<int>>>
+Ghost::precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjList)
 {
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> allPaths;
 
-    // Loop through each node as the start node
-    for (const auto& [start, _] : adjList)
-    {
+    for (const auto& [start, _] : adjList) {
         std::queue<int> q;
-        std::unordered_map<int, int> parent;  // To reconstruct paths
-        std::unordered_set<int> visited;      // To track visited nodes
+        std::unordered_map<int, int> parent;
+        std::unordered_set<int> visited;
+
         q.push(start);
         visited.insert(start);
         parent[start] = -1;
 
-        // BFS to find the shortest path from start to all other nodes
-        while (!q.empty())
-        {
+        while (!q.empty()) {
             int current = q.front();
             q.pop();
 
-            // Visit neighbors
-            for (int neighbor : adjList.at(current))
-            {
-                if (visited.find(neighbor) == visited.end())
-                {
+            for (int neighbor : adjList.at(current)) {
+                if (visited.find(neighbor) == visited.end()) {
                     visited.insert(neighbor);
                     parent[neighbor] = current;
                     q.push(neighbor);
@@ -40,20 +104,13 @@ std::unordered_map<int, std::unordered_map<int, std::vector<int>>> Ghost::precom
             }
         }
 
-        // Reconstruct the path from start to all other nodes
-        for (auto& [end, _] : parent)
-        {
+        for (const auto& [end, _] : parent) {
             std::vector<int> path;
             int cur = end;
-
-            // Backtrack from 'end' to 'start' to build the path
-            while (cur != -1)
-            {
+            while (cur != -1) {
                 path.push_back(cur);
                 cur = parent[cur];
             }
-
-            // Reverse the path to make it from start to end
             std::reverse(path.begin(), path.end());
             allPaths[start][end] = path;
         }
@@ -61,30 +118,6 @@ std::unordered_map<int, std::unordered_map<int, std::vector<int>>> Ghost::precom
 
     return allPaths;
 }
-
-// Constructor for Ghost
-Ghost::Ghost(sf::Texture& texture, sf::Vector2f startPos)
-{
-    sprite.setTexture(texture);
-    sprite.setPosition(startPos);
-    sprite.setOrigin(texture.getSize().x / 2.f, texture.getSize().y / 2.f);  // Set origin to center for rotation/positioning
-    sprite.setScale(2.8f, 2.8f);  // Set scale for appropriate ghost size
-}
-
-// Draw the ghost on the screen
-void Ghost::draw(sf::RenderWindow& window)
-{
-    window.draw(sprite);
-}
-
-// Set the ghost's position
-void Ghost::setPosition(sf::Vector2f pos)
-{
-    sprite.setPosition(pos);
-}
-
-// Get the ghost's position
-sf::Vector2f Ghost::getPosition() const
-{
-    return sprite.getPosition();
+const sf::Sprite& Ghost::getSprite() const {
+    return sprite;
 }

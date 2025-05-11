@@ -9,6 +9,13 @@ bool esc_button = false;
 int P_M_Sound = 100;
 int P_M_Music = 100;
 extern Sounds sound;
+
+bool waitingForKey = false;
+int actionToChange;
+extern Keyboard::Key moveLeftKey;
+extern Keyboard::Key moveRightKey;
+extern Keyboard::Key moveUpkey;
+extern Keyboard::Key moveDownkey;
 void Gameplay();
 
 Menu::Menu()
@@ -29,6 +36,23 @@ Menu::Menu()
     pillConsumed.assign(3, false);
     pillDelayStarted.assign(3, false);
     pillTimers.assign(3, Clock{});
+}
+
+void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey, Menu& menu9) {
+	if (keyboardKeyToString(newKey) == "Escape")
+		return;
+    if (action == 0) {
+        moveLeftKey = newKey;
+    }
+    else if (action == 1) {
+        moveRightKey = newKey;
+    }
+    else if (action == 2) {
+        moveUpkey = newKey;
+    }
+    else if (action == 3) {
+        moveDownkey = newKey;
+    }
 }
 
 void Menu::updateFaces(float dt)
@@ -100,7 +124,7 @@ void Menu::Face_intilization()
 
     Face.setTexture(&faceFrames[0]);
     Face.setSize({ 60,60 });
-    Face.setPosition(830, 582);
+    Face.setPosition(800, 582);
     Face.setScale(-1, 1);
 
     DownFace.setTexture(&faceFrames[0]);
@@ -174,7 +198,7 @@ void Menu::menu1(RenderWindow& window)
         mainmenu[i].setFont(font);
         mainmenu[i].setCharacterSize(50);
         mainmenu[i].setString(labels[i]);
-        mainmenu[i].setPosition(850, midY + yOff);
+        mainmenu[i].setPosition(820, midY + yOff);
         mainmenu[i].setFillColor(i == 0
             ? Color{ 255,204,0 }
         : Color::White);
@@ -217,7 +241,7 @@ void Menu::menu1(RenderWindow& window)
                     mainmenu[selected].setFillColor(Color::White);
                     selected = 6;
                     mainmenu[6].setFillColor(Color{ 255,204,0 });
-                    Face.setPosition(830, midY + 7 * positionOfFace-15);
+                    Face.setPosition(Face.getPosition().x, midY + 7 * positionOfFace-15);
                 }
             }
         }
@@ -258,7 +282,7 @@ void Menu::Play_menu(RenderWindow& window)
         menu2.mainmenu[i].setFont(menu2.font);
         menu2.mainmenu[i].setCharacterSize(50);
         menu2.mainmenu[i].setString(labels[i]);
-        menu2.mainmenu[i].setPosition(850, midY + yOff);
+        menu2.mainmenu[i].setPosition(820, midY + yOff);
         menu2.mainmenu[i].setFillColor(i == 0
             ? Color{ 255,204,0 }
         : Color::White);
@@ -286,7 +310,7 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.mainmenu[menu2.selected].setFillColor(Color::White);
                     menu2.selected = 2;
                     menu2.mainmenu[2].setFillColor(Color{ 255,204,0 });
-                    menu2.Face.setPosition(830, midY + 3 * positionOfFace -15);
+                    menu2.Face.setPosition(menu2.Face.getPosition().x, midY + 3 * positionOfFace -15);
                 }
                 if (evt.key.code == Keyboard::Down)
                     menu2.MoveDown(menu2.selected, 3);
@@ -336,7 +360,7 @@ void Menu::sound_options(RenderWindow& window)
         menu6.mainmenu[i].setFont(menu6.font);
         menu6.mainmenu[i].setCharacterSize(50);
         menu6.mainmenu[i].setString(labels[i]);
-        menu6.mainmenu[i].setPosition(850, midY + yOffset);
+        menu6.mainmenu[i].setPosition(820, midY + yOffset);
         menu6.mainmenu[i].setFillColor(i == 0
             ? Color{ 255,204,0 }
         : Color::White);
@@ -441,6 +465,198 @@ void Menu::sound_options(RenderWindow& window)
     }
 }
 
+void Menu::player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey)
+{
+    Menu menu9;
+    menu9.Face_intilization();
+    menu9.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
+    menu9.choises = 5;
+    menu9.mainmenu.resize(menu9.choises);
+
+    float yOffset = 40.f;
+    float midY = window.getSize().y * 0.5f;
+
+    for (int i = 0; i < menu9.choises; ++i)
+    {
+        menu9.mainmenu[i].setFont(menu9.font);
+        menu9.mainmenu[i].setCharacterSize(50);
+        menu9.mainmenu[i].setPosition(820, midY + yOffset);
+        menu9.mainmenu[i].setFillColor(i == 0 ? Color{ 255,204,0 } : Color::White);
+        yOffset += menu9.positionOfFace;
+    }
+
+    menu9.mainmenu[4].setString("Back");
+
+    bool draw = false;
+    RectangleShape overlay;
+    overlay.setSize(Vector2f(1920, 1080));
+    overlay.setFillColor(Color(0, 0, 0, 100));
+
+    Texture direction[4];
+    direction[0].loadFromFile("Assets/Textures/left.png");
+    direction[1].loadFromFile("Assets/Textures/right.png");
+    direction[2].loadFromFile("Assets/Textures/up.png");
+    direction[3].loadFromFile("Assets/Textures/down.png");
+
+    Sprite directionSprite;
+    directionSprite.setScale(1.5, 1.5);
+    directionSprite.setPosition(650, 400);
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
+
+            if (event.type == Event::KeyReleased)
+                pressed = false;
+
+            if (event.type == Event::KeyPressed && !pressed)
+            {
+                if (!waitingForKey)
+                {
+                    if (event.key.code == Keyboard::Down)
+                        menu9.MoveDown(menu9.selected, menu9.choises);
+                    else if (event.key.code == Keyboard::Up)
+                        menu9.MoveUp(menu9.selected, menu9.choises);
+                    else if (event.key.code == Keyboard::Escape && menu9.selected != 4)
+                    {
+                        menu9.mainmenu[menu9.selected].setFillColor(Color::White);
+                        menu9.selected = 4;
+                        menu9.mainmenu[4].setFillColor(Color{ 255, 204, 0 });
+                        menu9.Face.setPosition(menu9.Face.getPosition().x, midY + 5 * menu9.positionOfFace - 15);
+						pressed = true;
+                    }
+                    if (((event.key.code == Keyboard::Enter && menu9.selected == 4) || (event.key.code == Keyboard::Escape && menu9.selected == 4))&& !pressed)
+                    {
+                        return;
+                    }
+                    else if (event.key.code == Keyboard::Enter)
+                    {
+                        pressed = true;
+                        directionSprite.setTexture(direction[menu9.selected]);
+                        waitingForKey = true;
+                        draw = true;
+                    }
+                }
+                else // Waiting for a new key
+                {
+                    if (event.key.code != Keyboard::Enter)
+                    {
+                        int action = menu9.selected;
+                        menu9.changeKeyMapping(action, event.key.code, moveLeftKey, moveRightKey, moveUpkey, moveDownkey, menu9);
+                        draw = false;
+                        waitingForKey = false;
+                        pressed = true;
+                    }
+                }
+            }
+        }
+
+        // Update labels with current key bindings
+        menu9.mainmenu[0].setString("Move Left : " + keyboardKeyToString(moveLeftKey));
+        menu9.mainmenu[1].setString("Move Right : " + keyboardKeyToString(moveRightKey));
+        menu9.mainmenu[2].setString("Move Up : " + keyboardKeyToString(moveUpkey));
+        menu9.mainmenu[3].setString("Move Down : " + keyboardKeyToString(moveDownkey));
+
+        float dt = menu9.deltaClock.restart().asSeconds();
+        menu9.updateFaces(dt);
+
+        window.clear();
+        menu_UI.back_ground(window);
+        window.draw(menu_UI.bg);
+        for (auto& t : menu9.mainmenu) window.draw(t);
+        window.draw(menu9.Face);
+        for (auto& p : menu9.pills)     window.draw(p);
+        window.draw(menu9.DownFace);
+
+        if (draw)
+        {
+            window.draw(overlay);
+            window.draw(directionSprite);
+        }
+
+        window.display();
+    }
+}
+
+void Menu::control_menu(RenderWindow& window)
+{
+    Menu menu8;
+    menu8.Face_intilization();
+    menu8.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
+    menu8.choises = 3;
+    menu8.mainmenu.resize(menu8.choises);
+
+    static const std::string labels[3] = { "Player 1", "Player 2", "Back" };
+    float yOffset = 40.f;
+    float midY = window.getSize().y * 0.5f;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        menu8.mainmenu[i].setFont(menu8.font);
+        menu8.mainmenu[i].setCharacterSize(50);
+        menu8.mainmenu[i].setString(labels[i]);
+        menu8.mainmenu[i].setPosition(820, midY + yOffset);
+        menu8.mainmenu[i].setFillColor(i == 0 ? Color{ 255, 204, 0 } : Color::White);
+        yOffset += menu8.positionOfFace;
+    }
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
+
+            if (event.type == Event::KeyReleased)
+                pressed = false;
+
+            if (event.type == Event::KeyPressed && !pressed)
+            {
+                if (event.key.code == Keyboard::Down)
+                    menu8.MoveDown(menu8.selected, menu8.choises);
+                else if (event.key.code == Keyboard::Up)
+                    menu8.MoveUp(menu8.selected, menu8.choises);
+                else if (event.key.code == Keyboard::Escape && menu8.selected != 2)
+                {
+                    menu8.mainmenu[menu8.selected].setFillColor(Color::White);
+                    menu8.selected = 2;
+                    menu8.mainmenu[2].setFillColor(Color{ 255, 204, 0 });
+                    menu8.Face.setPosition(menu8.Face.getPosition().x, midY + 3 * menu8.positionOfFace - 15);
+					pressed = true;
+                }
+                if (((event.key.code == Keyboard::Enter && menu8.selected == 2) || (event.key.code == Keyboard::Escape && menu8.selected == 2))&& !pressed)
+                {
+                    pageNumber = 1000;
+                    return;
+                }
+                else if (event.key.code == Keyboard::Enter)
+                {
+                    pressed = true;
+                    if (menu8.selected == 0)  player_controls(window, moveLeftKey, moveRightKey, moveUpkey, moveDownkey);
+                    // else if (menu8.selected == 1)  player_controls(window, moveLeftKey2, moveRightKey2, jumpKey2); // For Player 2 in the future
+                }
+            }
+        }
+
+        float dt = menu8.deltaClock.restart().asSeconds();
+        menu8.updateFaces(dt);
+
+        window.clear();
+        menu_UI.back_ground(window);
+        window.draw(menu_UI.bg);
+        for (auto& t : menu8.mainmenu) window.draw(t);
+        window.draw(menu8.Face);
+        for (auto& p : menu8.pills)    window.draw(p);
+        window.draw(menu8.DownFace);
+        window.display();
+    }
+}
+
 void Menu::options_menu(RenderWindow& window)
 {
     Menu menu4;
@@ -465,7 +681,7 @@ void Menu::options_menu(RenderWindow& window)
         menu4.mainmenu[i].setFont(menu4.font);
         menu4.mainmenu[i].setCharacterSize(50);
         menu4.mainmenu[i].setString(labels[i]);
-        menu4.mainmenu[i].setPosition(850, midY + yOffset);
+        menu4.mainmenu[i].setPosition(820, midY + yOffset);
         menu4.mainmenu[i].setFillColor(i == 0
             ? Color{ 255,204,0 }
         : Color::White);
@@ -516,13 +732,10 @@ void Menu::options_menu(RenderWindow& window)
                 {
                     //if (menu4.selected == 0)  /*options_menu1(window);*/
                     if (menu4.selected == 1)  sound_options(window);
-                    //if (menu4.selected == 2)   /*control_menu(window);*/
+                    if (menu4.selected == 2)   control_menu(window);
                 }
             }
         }
-
-        if (!Keyboard::isKeyPressed(Keyboard::Escape))
-            pressed = false;
         float dt = menu4.deltaClock.restart().asSeconds();
         menu4.updateFaces(dt);
 
