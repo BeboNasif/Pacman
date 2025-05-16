@@ -14,7 +14,8 @@ Player::Player(Sprite& p) : player(p) {
     player_scale = 2.0;
     reachedNode = 1;
     initial_position = { 880+ 20,789 + 20};
-    State curr_state = idle;
+    curr_state = idle;
+    tmp_state = idle;
     player.setScale(player_scale, player_scale);
     player.setPosition(initial_position);
     Idle.loadFromFile("Assets/Textures/pacman/neutral.png");
@@ -52,19 +53,19 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
     if (!animation_running) {
         if (Keyboard::isKeyPressed(moveLeftKey)) {
             cur_dir = left;
-            curr_state = amove;
+            tmp_state = amove;
         }
         else if (Keyboard::isKeyPressed(moveRightKey)) {
             cur_dir = right;
-            curr_state = dmove;
+            tmp_state = dmove;
         }
         else if (Keyboard::isKeyPressed(moveDownkey)) {
             cur_dir = down;
-            curr_state = smove;
+            tmp_state = smove;
         }
         else if (Keyboard::isKeyPressed(moveUpkey)) {
             cur_dir = up;
-            curr_state = wmove;
+            tmp_state = wmove;
         }
 
         // Update the current node based on the player's position
@@ -81,14 +82,14 @@ void Player::updateMovement(vector<pair<int,int>> &pos) {
 
     for (int i = 1; i <= 64; i++) {
         if (abs(pos[i].first - player.getPosition().x) < 3 and abs(pos[i].second- player.getPosition().y) < 3) {
-            switch (curr_state) {
-                case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; 
+            switch (tmp_state) {
+            case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state;
                 break;
-            case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0;
+            case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0;curr_state = tmp_state;
                 break;
-            case amove: velocity.x = -walk_speed * playerdeltatime ,velocity.y = 0;
+            case amove: velocity.x = -walk_speed * playerdeltatime ,velocity.y = 0;curr_state = tmp_state;
                 break;
-            case dmove: velocity.x = walk_speed * playerdeltatime, velocity.y = 0;
+            case dmove: velocity.x = walk_speed * playerdeltatime, velocity.y = 0;curr_state = tmp_state;
                 break;
             default: 
                 break;  

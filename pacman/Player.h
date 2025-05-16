@@ -19,7 +19,7 @@ private:
     bool animation_running ;
     int live;
    
-   
+    State tmp_state;
     
 
     Texture Idle;
