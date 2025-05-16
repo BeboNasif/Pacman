@@ -24,6 +24,7 @@ public:
     int getCurrentNode() const;
     static std::unordered_map<int, std::unordered_map<int, std::vector<int>>> precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjList);
     const sf::Sprite& getSprite() const;
+    void reset();
 };
 
 

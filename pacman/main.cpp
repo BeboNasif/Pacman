@@ -24,18 +24,15 @@ void Gameplay() {
     MapSprite.setOrigin(mapText.getSize().x / 2.f, mapText.getSize().y / 2.f);
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
 
-    
     mp.init();
     Ghost redGhost(1, "Assets/red_ghost.png", mp.adjList, mp.pos);
     Ghost pinkGhost(2, "Assets/pink_ghost.png", mp.adjList, mp.pos);
     Ghost blueGhost(3, "Assets/blue_ghost.png", mp.adjList, mp.pos);
     Ghost yellowGhost(4, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
 
-
-    std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost }; //vector of ghost pointers
+    std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost }; 
 
     Player pacman(pacmanSprite);
-
 
     for (int i = 1; i <= 64; i++) {
         CircleShape c(1);
@@ -71,13 +68,16 @@ void Gameplay() {
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
 
         for (auto& ghost : ghosts) {
-            ghost->update(deltaTime, mp.adjList, mp.pos, pacmanNode);
+            if (!pacman.gameOver) {
+                ghost->update(deltaTime, mp.adjList, mp.pos, pacmanNode);
+            }
         }
 
-        for (auto& ghost : ghosts) {
-            if (pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
-                pacman.die();
-                break; 
+        if (true) {
+            for (auto& ghost : ghosts) {
+                if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
+                    pacman.die();
+                }
             }
         }
 
@@ -97,6 +97,9 @@ void Gameplay() {
         window.display();
     }
 }
+
+
+
 
 int main() {
     window.setFramerateLimit(120);

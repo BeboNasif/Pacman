@@ -27,46 +27,37 @@ void Ghost::update(float deltaTime,
     const std::vector<std::pair<int, int>>& pos,
     int pacmanNode)
 {
-    if (path.empty()) {
+    if (path.empty() || pathIndex + 1 >= path.size()) {
+        // Recalculate path if possible
         if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
             path = allPaths[currentNode][pacmanNode];
             pathIndex = 0;
         }
+        return; // Don't try to move if path is invalid
     }
 
-    if (pathIndex + 1 < path.size()) {
-        int nextNode = path[pathIndex + 1];
-        if (nextNode >= 0 && nextNode < (int)pos.size()) {
-            Vector2f currentPos = sprite.getPosition();
-            Vector2f targetPos(pos[nextNode].first, pos[nextNode].second);
+    Vector2f currentPos = sprite.getPosition();
+    Vector2f targetPos(pos[path[pathIndex + 1]].first, pos[path[pathIndex + 1]].second);
 
-            Vector2f dir = targetPos - currentPos;
-            float distance = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+    Vector2f dir = targetPos - currentPos;
+    float distance = std::sqrt(dir.x * dir.x + dir.y * dir.y);
 
-            if (distance < speed * deltaTime) {
-                sprite.setPosition(targetPos);
-                currentNode = nextNode;
-                pathIndex++;
+    if (distance < speed * deltaTime) {
+        sprite.setPosition(targetPos);
+        currentNode = path[pathIndex + 1];
+        pathIndex++;
 
-                if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
-                    path = allPaths[currentNode][pacmanNode];
-                    pathIndex = 0;
-                }
-            }
-            else {
-                dir /= distance;
-                sprite.move(dir * speed * deltaTime);
-            }
+        if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
+            path = allPaths[currentNode][pacmanNode];
+            pathIndex = 0;
         }
     }
     else {
-        // Path ended - recalc
-        if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
-            path = allPaths[currentNode][pacmanNode];
-            pathIndex = 0;
-        }
+        dir /= distance;
+        sprite.move(dir * speed * deltaTime);
     }
 }
+
 
 
 void Ghost::draw(sf::RenderWindow& window) {
@@ -120,4 +111,8 @@ Ghost::precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjLi
 }
 const sf::Sprite& Ghost::getSprite() const {
     return sprite;
+}
+void Ghost::reset() {
+    path.clear();
+    pathIndex = 0;
 }
