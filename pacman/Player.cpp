@@ -74,18 +74,18 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
 }
 
 void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-    // Get the current position of the player
+
     Vector2f currentPos = player.getPosition();
-    // Find the current node Pacman is at
+    float invert = 1;
     for (int i = 1; i <= 64; i++) {
         if (abs(pos[i].first - currentPos.x) < 3 && abs(pos[i].second - currentPos.y) < 3) {
             int next_node = -1;
 
-            // Determine the next node based on direction and adjacency list
             if (tmp_state == wmove) {
                 for (int neighbor : adj[i]) {
                     if (pos[neighbor].second < pos[i].second) {
                         next_node = neighbor;
+                        invert = 1;
                         break;
                     }
                 }
@@ -94,41 +94,52 @@ void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<in
                 for (int neighbor : adj[i]) {
                     if (pos[neighbor].second > pos[i].second) {
                         next_node = neighbor;
+                        invert = 1;
                         break;
                     }
                 }
             }
             else if (tmp_state == amove) {
+                if (i == 23) {
+                    next_node = 30;
+                    invert = -1;
+                    break;
+                }
                 for (int neighbor : adj[i]) {
                     if (pos[neighbor].first < pos[i].first) {
                         next_node = neighbor;
+                        invert = 1;
                         break;
                     }
                 }
             }
             else if (tmp_state == dmove) {
+                if (i == 30) {
+                    next_node = 23;
+                    invert = -1;
+                    break;
+                }
                 for (int neighbor : adj[i]) {
                     if (pos[neighbor].first > pos[i].first) {
                         next_node = neighbor;
+                        invert = 1;
                         break;
                     }
                 }
             }
 
-            // If a valid move is found, update the velocity and current node
             if (next_node != -1) {
                 cur_node = next_node;
                 switch (tmp_state) {
                 case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
                 case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
-                case amove: velocity.x = -walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
-                case dmove: velocity.x = walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
+                case amove: velocity.x = -invert * walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
+                case dmove: velocity.x = invert * walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
                 default: break;
                 }
                 break;
             }
             else {
-
                 bool keepMoving = false;
                 for (int neighbor : adj[cur_node]) {
                     if ((curr_state == wmove && pos[neighbor].second < pos[cur_node].second) ||
@@ -140,12 +151,10 @@ void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<in
                     }
                 }
 
-                if (keepMoving) {
-
-                }
-                else 
+                if (!keepMoving) {
                     velocity = { 0,0 };
-                break;
+                    break;
+                }
             }
         }
     }

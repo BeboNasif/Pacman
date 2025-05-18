@@ -9,7 +9,7 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Fullscreen);
+RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[65];
 
@@ -98,10 +98,10 @@ void Gameplay() {
         window.clear();
         window.draw(MapSprite);
 
-        for (int i = 1; i <= 64; i++) {
-            window.draw(pacman.nodes[i]);
-            window.draw(nodeNums[i]);
-        }
+        //for (int i = 1; i <= 64; i++) {
+            //window.draw(pacman.nodes[i]);
+            //window.draw(nodeNums[i]);
+        //}
 
         window.draw(pacmanSprite);
 
