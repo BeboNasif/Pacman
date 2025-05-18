@@ -54,7 +54,10 @@ void Ghost::update(float deltaTime,
     }
     else {
         dir /= distance;
-        sprite.move(dir * speed * deltaTime);
+        float invert = 1;
+        if ((currentNode == 23 and pacmanNode == 30) or (pacmanNode == 30 and currentNode == 23))
+            invert = -1;
+        sprite.move(invert * dir * speed * deltaTime);
     }
 }
 

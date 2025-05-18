@@ -9,8 +9,9 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close | Style::Fullscreen);
-CircleShape a7a;
+RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Fullscreen);
+
+Text nodeNums[65];
 
 void Gameplay() {
     Sprite pacmanSprite;
@@ -25,6 +26,8 @@ void Gameplay() {
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
 
     mp.init();
+    mp.printAdjList();
+
     Ghost redGhost(1, "Assets/red_ghost.png", mp.adjList, mp.pos);
     Ghost pinkGhost(2, "Assets/pink_ghost.png", mp.adjList, mp.pos);
     Ghost blueGhost(3, "Assets/blue_ghost.png", mp.adjList, mp.pos);
@@ -34,10 +37,21 @@ void Gameplay() {
 
     Player pacman(pacmanSprite);
 
+    Font fnt;
+    fnt.loadFromFile("Assets/Fonts/Komigo3D-Regular.ttf");
+    
     for (int i = 1; i <= 64; i++) {
         CircleShape c(1);
         auto cur = mp.pos[i];
         Vector2f v(cur.first, cur.second);
+    
+        Text node;
+        node.setFont(fnt);
+        node.setPosition(v);
+        node.setString(to_string(i));
+        node.setCharacterSize(30);
+        node.setFillColor(Color::Blue);
+        nodeNums[i] = node;
         c.setPosition(v);
         pacman.nodes[i] = c;
     }
@@ -59,7 +73,7 @@ void Gameplay() {
         if (!pacman.gameOver) {
             pacman.setDeltaTime(deltaTime);
             pacman.handleInput(mp.adjList, mp.pos);
-            pacman.updateMovement(mp.pos);
+            pacman.updateMovement(mp.adjList,mp.pos);
             pacman.updateAnimation();
             pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
         }
@@ -76,7 +90,7 @@ void Gameplay() {
         if (true) {
             for (auto& ghost : ghosts) {
                 if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
-                    pacman.die();
+                    //pacman.die();
                 }
             }
         }
@@ -86,6 +100,7 @@ void Gameplay() {
 
         for (int i = 1; i <= 64; i++) {
             window.draw(pacman.nodes[i]);
+            window.draw(nodeNums[i]);
         }
 
         window.draw(pacmanSprite);
@@ -93,7 +108,6 @@ void Gameplay() {
         for (auto& ghost : ghosts) {
             ghost->draw(window);
         }
-
         window.display();
     }
 }

@@ -13,7 +13,7 @@ Player::Player(Sprite& p) : player(p) {
     walk_speed = 150.f;
     player_scale = 2.0;
     reachedNode = 1;
-    initial_position = { 880+ 20,789 + 20};
+    initial_position = { 880 + 20,789 + 20 };
     curr_state = idle;
     tmp_state = idle;
     player.setScale(player_scale, player_scale);
@@ -32,7 +32,7 @@ Player::Player(Sprite& p) : player(p) {
     animationTextures[amove] = vector<Texture>(2);
     animationTextures[dmove] = vector<Texture>(2);
     animationTextures[dead] = vector<Texture>(11);
-   
+
     for (int i = 0; i < 2; i++) {
         animationTextures[wmove][i].loadFromFile("Assets/Textures/pacman/up_" + to_string(i) + ".png");
         animationTextures[smove][i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + ".png");
@@ -73,32 +73,83 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
     }
 }
 
-
-
-
-void Player::updateMovement(vector<pair<int,int>> &pos) {
-    //velocity = { 0,0 };
-
-
+void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
+    // Get the current position of the player
+    Vector2f currentPos = player.getPosition();
+    // Find the current node Pacman is at
     for (int i = 1; i <= 64; i++) {
-        if (abs(pos[i].first - player.getPosition().x) < 3 and abs(pos[i].second- player.getPosition().y) < 3) {
-            switch (tmp_state) {
-            case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state;
+        if (abs(pos[i].first - currentPos.x) < 3 && abs(pos[i].second - currentPos.y) < 3) {
+            int next_node = -1;
+
+            // Determine the next node based on direction and adjacency list
+            if (tmp_state == wmove) {
+                for (int neighbor : adj[i]) {
+                    if (pos[neighbor].second < pos[i].second) {
+                        next_node = neighbor;
+                        break;
+                    }
+                }
+            }
+            else if (tmp_state == smove) {
+                for (int neighbor : adj[i]) {
+                    if (pos[neighbor].second > pos[i].second) {
+                        next_node = neighbor;
+                        break;
+                    }
+                }
+            }
+            else if (tmp_state == amove) {
+                for (int neighbor : adj[i]) {
+                    if (pos[neighbor].first < pos[i].first) {
+                        next_node = neighbor;
+                        break;
+                    }
+                }
+            }
+            else if (tmp_state == dmove) {
+                for (int neighbor : adj[i]) {
+                    if (pos[neighbor].first > pos[i].first) {
+                        next_node = neighbor;
+                        break;
+                    }
+                }
+            }
+
+            // If a valid move is found, update the velocity and current node
+            if (next_node != -1) {
+                cur_node = next_node;
+                switch (tmp_state) {
+                case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
+                case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
+                case amove: velocity.x = -walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
+                case dmove: velocity.x = walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
+                default: break;
+                }
                 break;
-            case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0;curr_state = tmp_state;
+            }
+            else {
+
+                bool keepMoving = false;
+                for (int neighbor : adj[cur_node]) {
+                    if ((curr_state == wmove && pos[neighbor].second < pos[cur_node].second) ||
+                        (curr_state == smove && pos[neighbor].second > pos[cur_node].second) ||
+                        (curr_state == amove && pos[neighbor].first < pos[cur_node].first) ||
+                        (curr_state == dmove && pos[neighbor].first > pos[cur_node].first)) {
+                        keepMoving = true;
+                        break;
+                    }
+                }
+
+                if (keepMoving) {
+
+                }
+                else 
+                    velocity = { 0,0 };
                 break;
-            case amove: velocity.x = -walk_speed * playerdeltatime ,velocity.y = 0;curr_state = tmp_state;
-                break;
-            case dmove: velocity.x = walk_speed * playerdeltatime, velocity.y = 0;curr_state = tmp_state;
-                break;
-            default: 
-                break;  
             }
         }
     }
-    
-
-     player.move(velocity);
+    player.move(velocity);
 }
 
 void Player::updatePlace(Vector2f window) {
@@ -135,7 +186,7 @@ void Player::updateAnimation() {
             updateAnimationCounter(0.08f);
     }
 
-    
+
 }
 
 
@@ -146,19 +197,19 @@ void Player::updateAnimationCounter(float speedThreshold) {
         ImageCounter++;
         if (ImageCounter >= maximagecounter) {
             ImageCounter = 0;
-            if (curr_state == dead  ) {
+            if (curr_state == dead) {
                 if (live > 0) {
-                    cout << live<<endl;
+                    cout << live << endl;
                     live--;
                     resetAfterDeath();
                 }
                 else {
-                    cout << "Game Over"<<endl;
+                    cout << "Game Over" << endl;
                     gameOver = true;
-                    return ;
+                    return;
                 }
             }
-            
+
         }
     }
 }
@@ -173,7 +224,7 @@ void Player::die() {
 }
 
 void Player::resetAfterDeath() {
-    isDead = false;
+    isDead = false; 
     animation_running = false;
     curr_state = idle;
     ImageCounter = 0;

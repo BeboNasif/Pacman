@@ -11,16 +11,16 @@ private:
     float playerdeltatime;
     float walk_speed;
     float player_scale;
-    Vector2f velocity ;
+    Vector2f velocity;
     Vector2f initial_position;
-    int ImageCounter ;
+    int ImageCounter;
     int maximagecounter;
-    float AnimationCounter ;
-    bool animation_running ;
+    float AnimationCounter;
+    bool animation_running;
     int live;
-   
+
     State tmp_state;
-    
+
 
     Texture Idle;
     unordered_map<State, vector<Texture>> animationTextures;
@@ -39,7 +39,7 @@ public:
     Player(Sprite& p);
     void setDeltaTime(float dt);
     void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos);
-    void updateMovement(vector<pair<int, int>>& pos);
+    void updateMovement(unordered_map<int, vector<int>>& adj,vector<pair<int, int>>& pos);
     void updatePlace(Vector2f window);
     void updateAnimation();
     void die();
@@ -49,4 +49,3 @@ private:
     void resetAfterDeath();
     void updateAnimationCounter(float speedThreshold);
 };
-

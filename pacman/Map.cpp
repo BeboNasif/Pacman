@@ -7,12 +7,12 @@ void Map::addEdge(int u, int v) {
 }
 
 void Map::printAdjList() {
-    for (const auto& [node, neighbors] : adjList) {
-        //cout << node << ": ";
-        for (int neighbor : neighbors) {
-           // cout << neighbor << " ";
+    for (int node = 1; node <= 64;node++) {
+        cout << node << ": ";
+        for (int neighbor : adjList[node]) {
+            cout << neighbor << " ";
         }
-        //cout << "\n";
+        cout << "\n";
     }
 }
 
