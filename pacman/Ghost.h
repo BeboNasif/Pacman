@@ -26,10 +26,10 @@ public:
     const sf::Sprite& getSprite() const;
     void reset(int startNode, const std::vector<std::pair<int, int>>& pos);
 
-    int EL7okooma(int pacmanNode); //pacmannode + 2
-    int ELSaad(int pacmanNode); // double distance shit
-    int Amoor(int pacmanNode); //afraid one (shaz)
-    int Ad3k(int pacmanNode); // red
+    int EL7okooma(int pacmanNode,int dir, unordered_map<int, std::vector<int>>& adjList); //pacmannode + 3
+    int ELSaad(int pacmanNode, int dir, int Ad3kdist, unordered_map<int, std::vector<int>>& adjList); // pacmannode + ad3ak distance 
+    int Amoor(int pacmanNode); //afraid one (runs to corners when near pacman) 
+    int Ad3k(int pacmanNode); // red (  ad3k >:)  )
 };
 
 

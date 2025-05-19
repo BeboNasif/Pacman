@@ -12,12 +12,12 @@ Ghost::Ghost(int startNode, const std::string& texturePath,
     adjList[92].clear();
     texture.loadFromFile(texturePath);
     sprite.setTexture(texture);
-    sprite.setOrigin(11, 11);
-    sprite.setScale(2.7f, 2.7f);
+    sprite.setOrigin(8, 8);
+    sprite.setScale(3.5f, 3.5);
     currentNode = startNode;
     pathIndex = 0;
     elapsedTime = 0;
-    speed = 100.0f;
+    speed = 150.f;
 
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
 
@@ -56,10 +56,7 @@ void Ghost::update(float deltaTime,
     }
     else {
         dir /= distance;
-        float invert = 1;
-        if ((currentNode == 23 and pacmanNode == 30) or (pacmanNode == 30 and currentNode == 23))
-            invert = -1;
-        sprite.move(invert * dir * speed * deltaTime);
+        sprite.move(dir * speed * deltaTime);
     }
 }
 
@@ -125,10 +122,56 @@ void Ghost::reset(int startNode, const std::vector<std::pair<int, int>>& pos) {
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
 }
 
+int Ghost::Amoor(int pacmanNode) {
+    vector<int> corners = { 1,10,81,90 };
+    if (allPaths[currentNode][pacmanNode].size() > 6)
+        return pacmanNode;
+    else {
+        int mn = 100;
+        int target = pacmanNode;
+        for (auto x : corners) 
+            if (allPaths[currentNode][x].size() < mn and currentNode != x)
+                mn = allPaths[currentNode][x].size(), target = x;
+        
+        return target;
+    }
+}
+
 int Ghost::Ad3k(int pacmanNode) {
     return pacmanNode;
 }
 
-int Ghost::EL7okooma(int pacmanNode) {
-    //huuh
+// up : 0, down : 1, right : 2, left : 3
+
+int dfs(int node, int start,int limit,int steps, unordered_map<int, std::vector<int>>& adjList) {
+    if (steps == limit) return node;
+    for (auto child : adjList[node]) {
+        if (child == start) continue;
+        return dfs(child, start, limit, steps + 1, adjList);
+        break;
+    }
+}
+int getNext(int pacmanNode, int dir) {
+    int node = pacmanNode;
+    if (dir == 0) node = pacmanNode - 10;
+    if (dir == 1) node = pacmanNode + 10;
+    if (dir == 2) node = pacmanNode + 1;
+    if (dir == 3) node = pacmanNode - 1;
+    return node;
+}
+
+int Ghost::EL7okooma(int pacmanNode,int dir, unordered_map<int, std::vector<int>>& adjList) {
+    // node -> the node pacman is directed to 
+    int node = getNext(pacmanNode, dir);
+    int limit = 3;
+    return dfs(node, pacmanNode, limit, 0,adjList);
+
+}
+int Ghost::ELSaad(int pacmanNode,int dir, int Ad3kNode, unordered_map<int, std::vector<int>>& adjList)
+{
+    int node = getNext(pacmanNode, dir);
+    int dist = allPaths[Ad3kNode][pacmanNode].size();
+    int limit = dist + 2;
+    return dfs(node, pacmanNode, limit, 0, adjList);
+    
 }

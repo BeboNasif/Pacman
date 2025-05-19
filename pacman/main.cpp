@@ -26,14 +26,14 @@ void Gameplay() {
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
 
     mp.init();
-    mp.printAdjList();
+    //mp.printAdjList();
 
     Ghost redGhost(34, "Assets/red_ghost.png", mp.adjList, mp.pos);
     Ghost pinkGhost(40, "Assets/pink_ghost.png", mp.adjList, mp.pos);
     Ghost blueGhost(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
     Ghost yellowGhost(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
 
-    std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost }; 
+    std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 
     Player pacman(pacmanSprite);
 
@@ -81,9 +81,16 @@ void Gameplay() {
         Vector2f pacmanPosition = pacmanSprite.getPosition();
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
 
-        for (auto& ghost : ghosts) {
-            if (!pacman.gameOver or !pacman.isDead) {
-                ghost->update(deltaTime, mp.adjList, mp.pos, pacmanNode);
+        
+        for (int i = 0; i < 4;i++) {
+
+            if ((!pacman.gameOver or !pacman.isDead) and pacman.curr_state) {
+                int target = 0;
+                if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
+                if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode,pacman.curr_state,mp.adjList);
+                if (i == 2)  target = ghosts[i]->Amoor(pacmanNode);
+                if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList);
+                ghosts[i]->update(deltaTime, mp.adjList, mp.pos, target);
             }
         }
 

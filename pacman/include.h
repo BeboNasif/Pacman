@@ -1,6 +1,7 @@
 #pragma once
 #include <utility>
 #include <map>
+#include "Map.h"
 #include <unordered_map>
 #include <fstream>
 #include <SFML/Graphics.hpp>
