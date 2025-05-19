@@ -7,7 +7,7 @@ void Map::addEdge(int u, int v) {
 }
 
 void Map::printAdjList() {
-    for (int node = 1; node <= 64;node++) {
+    for (int node = 1; node <= 90;node++) {
         cout << node << ": ";
         for (int neighbor : adjList[node]) {
             cout << neighbor << " ";

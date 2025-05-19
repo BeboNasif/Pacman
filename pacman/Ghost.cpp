@@ -5,9 +5,11 @@
 #include <algorithm>
 
 Ghost::Ghost(int startNode, const std::string& texturePath,
-    const std::unordered_map<int, std::vector<int>>& adjList,
+    unordered_map<int, std::vector<int>> adjList,
     const std::vector<std::pair<int, int>>& pos)
 {
+    adjList[91].clear();
+    adjList[92].clear();
     texture.loadFromFile(texturePath);
     sprite.setTexture(texture);
     sprite.setOrigin(11, 11);
@@ -115,7 +117,10 @@ Ghost::precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjLi
 const sf::Sprite& Ghost::getSprite() const {
     return sprite;
 }
-void Ghost::reset() {
+
+void Ghost::reset(int startNode, const std::vector<std::pair<int, int>>& pos) {
     path.clear();
+    currentNode = startNode;
     pathIndex = 0;
+    sprite.setPosition(pos[startNode].first, pos[startNode].second);
 }

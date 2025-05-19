@@ -19,7 +19,8 @@ Player::Player(Sprite& p) : player(p) {
     player.setScale(player_scale, player_scale);
     player.setPosition(initial_position);
     Idle.loadFromFile("Assets/Textures/pacman/neutral.png");
-    live = 3;
+
+    live = 2;
     animation_running = false;
     isDead = false;
     ImageCounter = 0;
@@ -73,12 +74,13 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
     }
 }
 
-void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-
+void Player::updateMovement(unordered_map<int, vector<int>> adj, vector<pair<int, int>>& pos) {
+    adj[34].clear();
+    adj[34].push_back(33), adj[34].push_back(35);
     Vector2f currentPos = player.getPosition();
     float invert = 1;
     if (curr_state != dead) {
-        for (int i = 1; i <= 64; i++) {
+        for (int i = 1; i <= 90; i++) {
             if (abs(pos[i].first - currentPos.x) < 3 && abs(pos[i].second - currentPos.y) < 3) {
                 int next_node = -1;
 
@@ -101,8 +103,8 @@ void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<in
                     }
                 }
                 else if (tmp_state == amove) {
-                    if (i == 23) {
-                        next_node = 30;
+                    if (i == 91) {
+                        next_node = 92;
                         invert = -1;
                         break;
                     }
@@ -115,8 +117,8 @@ void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<in
                     }
                 }
                 else if (tmp_state == dmove) {
-                    if (i == 30) {
-                        next_node = 23;
+                    if (i == 92) {
+                        next_node = 91;
                         invert = -1;
                         break;
                     }
@@ -211,8 +213,8 @@ void Player::updateAnimationCounter(float speedThreshold) {
             ImageCounter = 0;
             if (curr_state == dead) {
                 if (live > 0) {
-                    cout << live << endl;
                     live--;
+                    cout << live << endl;
                     resetAfterDeath();
                 }
                 else {
@@ -238,7 +240,8 @@ void Player::die() {
 void Player::resetAfterDeath() {
     isDead = false; 
     animation_running = false;
-    curr_state = idle;
+    curr_state = idle; 
+    tmp_state = idle;
     ImageCounter = 0;
     AnimationCounter = 0;
     player.setTexture(Idle);
@@ -249,7 +252,7 @@ int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f p
     int closestNode = -1;
     float minDistance = FLT_MAX;
 
-    for (int i = 1; i <= 64; i++) {
+    for (int i = 1; i <= 90; i++) {
         float distance = sqrt(pow(pos[i].first - playerPosition.x, 2) + pow(pos[i].second - playerPosition.y, 2));
         if (distance < minDistance) {
             minDistance = distance;

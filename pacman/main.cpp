@@ -11,12 +11,12 @@ Menu menu;
 Sounds sound;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
-Text nodeNums[65];
+Text nodeNums[95];
 
 void Gameplay() {
     Sprite pacmanSprite;
     pacmanSprite.setOrigin(11, 11);
-
+    pacmanSprite.setScale(0.6, 0.6);
     Sprite MapSprite;
     Texture mapText;
     mapText.loadFromFile("Assets/FullMap.png");
@@ -28,10 +28,10 @@ void Gameplay() {
     mp.init();
     mp.printAdjList();
 
-    Ghost redGhost(1, "Assets/red_ghost.png", mp.adjList, mp.pos);
-    Ghost pinkGhost(2, "Assets/pink_ghost.png", mp.adjList, mp.pos);
-    Ghost blueGhost(3, "Assets/blue_ghost.png", mp.adjList, mp.pos);
-    Ghost yellowGhost(4, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
+    Ghost redGhost(34, "Assets/red_ghost.png", mp.adjList, mp.pos);
+    Ghost pinkGhost(40, "Assets/pink_ghost.png", mp.adjList, mp.pos);
+    Ghost blueGhost(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
+    Ghost yellowGhost(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
 
     std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost }; 
 
@@ -40,7 +40,7 @@ void Gameplay() {
     Font fnt;
     fnt.loadFromFile("Assets/Fonts/Komigo3D-Regular.ttf");
     
-    for (int i = 1; i <= 64; i++) {
+    for (int i = 1; i <= 92; i++) {
         CircleShape c(1);
         auto cur = mp.pos[i];
         Vector2f v(cur.first, cur.second);
@@ -90,6 +90,12 @@ void Gameplay() {
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 pacman.die();
+                int i = 0;
+                vector<int> starts = { 34,40,41,42 };
+                for (auto& ghost : ghosts) {
+                    ghost->reset(starts[i], mp.pos);
+                    i++;
+                }
             }
         }
 
@@ -97,10 +103,10 @@ void Gameplay() {
         window.clear();
         window.draw(MapSprite);
 
-        for (int i = 1; i <= 64; i++) {
-            window.draw(pacman.nodes[i]);
-            window.draw(nodeNums[i]);
-        }
+        //for (int i = 1; i <= 92; i++) {
+          /*  window.draw(pacman.nodes[i]);
+            window.draw(nodeNums[i]);*/
+        //}
 
         window.draw(pacmanSprite);
 

@@ -26,7 +26,7 @@ private:
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
-    CircleShape nodes[70];
+    CircleShape nodes[93];
     enum Dir { up, down, right, left };
     Dir cur_dir;
     Vector2f frozenPosition;
@@ -39,7 +39,7 @@ public:
     Player(Sprite& p);
     void setDeltaTime(float dt);
     void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos);
-    void updateMovement(unordered_map<int, vector<int>>& adj,vector<pair<int, int>>& pos);
+    void updateMovement(unordered_map<int, vector<int>> adj,vector<pair<int, int>>& pos);
     void updatePlace(Vector2f window);
     void updateAnimation();
     void die();
