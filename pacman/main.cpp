@@ -82,26 +82,25 @@ void Gameplay() {
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
 
         for (auto& ghost : ghosts) {
-            if (!pacman.gameOver) {
+            if (!pacman.gameOver or !pacman.isDead) {
                 ghost->update(deltaTime, mp.adjList, mp.pos, pacmanNode);
             }
         }
 
-        if (true) {
-            for (auto& ghost : ghosts) {
-                if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
-                    //pacman.die();
-                }
+        for (auto& ghost : ghosts) {
+            if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
+                pacman.die();
             }
         }
+
 
         window.clear();
         window.draw(MapSprite);
 
-        //for (int i = 1; i <= 64; i++) {
-            //window.draw(pacman.nodes[i]);
-            //window.draw(nodeNums[i]);
-        //}
+        for (int i = 1; i <= 64; i++) {
+            window.draw(pacman.nodes[i]);
+            window.draw(nodeNums[i]);
+        }
 
         window.draw(pacmanSprite);
 
