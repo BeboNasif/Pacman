@@ -8,30 +8,32 @@ using namespace std;
 
 class Ghost {
 private:
-    Texture texture;
-    Sprite sprite;
+    int animationFrame;
+    float animationTimer;
+    float animationSpeed;
+    sf::Vector2f lastDir;
+    void updateAnimation();
+
+    sf::Texture texture;
+    sf::Sprite sprite;
     float speed;
     int currentNode;
     float elapsedTime;
     int pathIndex;
-    vector<int> path;
+    std::vector<int> path;
+    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> allPaths;
 
 public:
-    static unordered_map<int, unordered_map<int, vector<int>>> allPaths;
-    Ghost(int startNode, string texturePath, unordered_map<int, vector<int>>& adjList, vector<pair<int, int>>& pos);
+    Ghost(int startNode, const std::string& texturePath, unordered_map<int, std::vector<int>> adjList, const std::vector<std::pair<int, int>>& pos);
+    void update(float deltaTime, const std::unordered_map<int, std::vector<int>>& adjList, const std::vector<std::pair<int, int>>& pos, int pacmanNode);
+    void draw(sf::RenderWindow& window);
+    int getCurrentNode() const;
+    static std::unordered_map<int, std::unordered_map<int, std::vector<int>>> precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjList);
+    const sf::Sprite& getSprite() const;
+    void reset(int startNode, const std::vector<std::pair<int, int>>& pos);
 
-
-    void update(float deltaTime,  unordered_map<int, vector<int>>& adjList,  vector<pair<int, int>>& pos, int pacmanNode);
-    void draw(RenderWindow& window);
-    int getCurrentNode();
-    static unordered_map<int, unordered_map<int, vector<int>>> precomputeAllPaths( unordered_map<int, vector<int>>& adjList);
-    Sprite& getSprite() ;
-    void reset(int startNode, vector<pair<int, int>>& pos);
-
-    int EL7okooma(int pacmanNode,int dir, unordered_map<int, vector<int>>& adjList); //pacmannode + 3
-    int ELSaad(int pacmanNode, int dir, int Ad3kdist, unordered_map<int, vector<int>>& adjList); // pacmannode + ad3ak distance 
+    int EL7okooma(int pacmanNode, int dir, unordered_map<int, std::vector<int>>& adjList); //pacmannode + 3
+    int ELSaad(int pacmanNode, int dir, int Ad3kdist, unordered_map<int, std::vector<int>>& adjList); // pacmannode + ad3ak distance 
     int Amoor(int pacmanNode); //afraid one (runs to corners when near pacman) 
     int Ad3k(int pacmanNode); // red (  ad3k >:)  )
 };
-//Ghost 
-

@@ -1,11 +1,11 @@
-﻿#include "include.h"
+﻿
 #include "Menu.h"
 #include "menu_Bg.h"
 #include "Player.h"
 #include "Sounds.h"
 #include "Map.h"
 #include "Ghost.h"
-
+#include "include.h"
 Map mp;
 Menu menu;
 Sounds sound;
@@ -14,6 +14,7 @@ RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 Text nodeNums[95];
 
 void Gameplay() {
+    int score = 0;
     Sprite pacmanSprite;
     pacmanSprite.setOrigin(11, 11);
     pacmanSprite.setScale(0.6, 0.6);
@@ -24,26 +25,38 @@ void Gameplay() {
     MapSprite.setScale(1.65f, 1.65f);
     MapSprite.setOrigin(mapText.getSize().x / 2.f, mapText.getSize().y / 2.f);
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
-
+    Text Score;
+    Text ScoreVal;
     mp.init();
     //mp.printAdjList();
 
-    Ghost Adham(34, "Assets/red_ghost.png", mp.adjList, mp.pos);
-    Ghost Samir(40, "Assets/pink_ghost.png", mp.adjList, mp.pos);
-    Ghost Kareem(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
-    Ghost Ibrahim(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
-    std::vector<Ghost*> ghosts = { &Adham, &Samir, &Kareem, &Ibrahim };
+    Ghost redGhost(34, "Assets/red.png", mp.adjList, mp.pos);
+    Ghost pinkGhost(40, "Assets/pink.png", mp.adjList, mp.pos);
+    Ghost blueGhost(41, "Assets/cyan.png", mp.adjList, mp.pos);
+    Ghost yellowGhost(42, "Assets/yellow.png", mp.adjList, mp.pos);
+
+    vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 
     Player pacman(pacmanSprite);
 
-    Font fnt;
-    fnt.loadFromFile("Assets/Fonts/Komigo3D-Regular.ttf");
-    
+    Font fnt, fnt2;
+    fnt.loadFromFile("Assets/Fonts/Freedom-10eM.ttf");
+    fnt2.loadFromFile("Assets/Fonts/Carre-JWja.ttf");
+    Score.setFont(fnt);
+    ScoreVal.setFont(fnt2);
+    Score.setScale(2, 2);
+    ScoreVal.setScale(2, 2);
+    Score.setPosition(50, 0);
+    ScoreVal.setPosition(300, 0);
+    Score.setString("Score ");
+    ScoreVal.setString(": " + to_string(score));
+
     for (int i = 1; i <= 92; i++) {
-        CircleShape c(1);
+        CircleShape c(3);
+        c.setFillColor(Color::Yellow);
         auto cur = mp.pos[i];
         Vector2f v(cur.first, cur.second);
-    
+
         Text node;
         node.setFont(fnt);
         node.setPosition(v);
@@ -52,13 +65,12 @@ void Gameplay() {
         node.setFillColor(Color::Blue);
         nodeNums[i] = node;
         c.setPosition(v);
+
         pacman.nodes[i] = c;
     }
 
     Clock clock;
     srand(time(NULL));
-
-    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
 
     while (window.isOpen()) {
         float deltaTime = clock.restart().asSeconds();
@@ -74,21 +86,21 @@ void Gameplay() {
         if (!pacman.gameOver) {
             pacman.setDeltaTime(deltaTime);
             pacman.handleInput(mp.adjList, mp.pos);
-            pacman.updateMovement(mp.adjList,mp.pos);
-            pacman.updateAnimation();
+            pacman.updateMovement(mp.adjList, mp.pos);
+            pacman.updateAnimation(ghosts, mp);
             pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
         }
 
         Vector2f pacmanPosition = pacmanSprite.getPosition();
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
 
-        
+
         for (int i = 0; i < 4;i++) {
 
             if ((!pacman.gameOver or !pacman.isDead) and pacman.curr_state) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
-                if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode,pacman.curr_state,mp.adjList);
+                if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList);
                 if (i == 2)  target = ghosts[i]->Amoor(pacmanNode);
                 if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList);
                 ghosts[i]->update(deltaTime, mp.adjList, mp.pos, target);
@@ -98,29 +110,36 @@ void Gameplay() {
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 pacman.die();
-                int i = 0;
-                vector<int> starts = { 34,40,41,42 };
-                for (auto& ghost : ghosts) {
-                    ghost->reset(starts[i], mp.pos);
-                    i++;
-                }
             }
         }
 
-
+        for (int i = 1; i <= 90; i++) {
+            if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+            if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
+                pacman.nodes[i].setScale(0, 0);
+                score += 20;
+            }
+        }
+        //cout << score << endl;
+        Score.setString("Score");
+        ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
 
-        //for (int i = 1; i <= 92; i++) {
-          /*  window.draw(pacman.nodes[i]);
-            window.draw(nodeNums[i]);*/
-        //}
+        for (int i = 1; i <= 90; i++) {
+            if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+            window.draw(pacman.nodes[i]);
+            //window.draw(nodeNums[i]);
+        }
 
-        window.draw(pacmanSprite);
 
         for (auto& ghost : ghosts) {
             ghost->draw(window);
         }
+        window.draw(pacmanSprite);
+        window.draw(Score);
+        window.draw(ScoreVal);
+
         window.display();
     }
 }
@@ -130,8 +149,6 @@ void Gameplay() {
 
 int main() {
     window.setFramerateLimit(120);
-    menu.menu1(window); 
+    menu.menu1(window);
     Gameplay();
 }
-
-
