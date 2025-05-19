@@ -25,7 +25,8 @@ void Gameplay() {
     MapSprite.setScale(1.65f, 1.65f);
     MapSprite.setOrigin(mapText.getSize().x / 2.f, mapText.getSize().y / 2.f);
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
-
+    Text Score;
+    Text ScoreVal;
     mp.init();
     //mp.printAdjList();
 
@@ -34,12 +35,21 @@ void Gameplay() {
     Ghost blueGhost(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
     Ghost yellowGhost(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
 
-    std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
+    vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 
     Player pacman(pacmanSprite);
 
-    Font fnt;
-    fnt.loadFromFile("Assets/Fonts/Komigo3D-Regular.ttf");
+    Font fnt,fnt2;
+    fnt.loadFromFile("Assets/Fonts/Freedom-10eM.ttf");
+    fnt2.loadFromFile("Assets/Fonts/Carre-JWja.ttf");
+    Score.setFont(fnt);
+    ScoreVal.setFont(fnt2);
+    Score.setScale(2,2);
+    ScoreVal.setScale(2,2);
+    Score.setPosition(50,0);
+    ScoreVal.setPosition(300,0);
+    Score.setString("Score " );
+    ScoreVal.setString(": " + to_string(score));
     
     for (int i = 1; i <= 92; i++) {
         CircleShape c(3);
@@ -107,12 +117,12 @@ void Gameplay() {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
                 pacman.nodes[i].setScale(0,0);
-                score += 50;
+                score += 20;
             }
         }
-        cout << score << endl;
-
-
+        //cout << score << endl;
+        Score.setString("Score");
+        ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
 
@@ -127,6 +137,9 @@ void Gameplay() {
             ghost->draw(window);
         }
         window.draw(pacmanSprite);
+        window.draw(Score);
+        window.draw(ScoreVal);
+        
         window.display();
     }
 }
