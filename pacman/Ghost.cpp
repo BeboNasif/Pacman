@@ -6,8 +6,7 @@
 
 Ghost::Ghost(int startNode, const std::string& texturePath,
     unordered_map<int, std::vector<int>> adjList,
-    const std::vector<std::pair<int, int>>& pos)
-{
+    const std::vector<std::pair<int, int>>& pos) {
     adjList[91].clear();
     adjList[92].clear();
     texture.loadFromFile(texturePath);

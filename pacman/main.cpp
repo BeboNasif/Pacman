@@ -14,6 +14,7 @@ RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 Text nodeNums[95];
 
 void Gameplay() {
+    int score = 0;
     Sprite pacmanSprite;
     pacmanSprite.setOrigin(11, 11);
     pacmanSprite.setScale(0.6, 0.6);
@@ -41,7 +42,8 @@ void Gameplay() {
     fnt.loadFromFile("Assets/Fonts/Komigo3D-Regular.ttf");
     
     for (int i = 1; i <= 92; i++) {
-        CircleShape c(1);
+        CircleShape c(3);
+        c.setFillColor(Color::Yellow);
         auto cur = mp.pos[i];
         Vector2f v(cur.first, cur.second);
     
@@ -53,6 +55,7 @@ void Gameplay() {
         node.setFillColor(Color::Blue);
         nodeNums[i] = node;
         c.setPosition(v);
+       
         pacman.nodes[i] = c;
     }
 
@@ -74,7 +77,7 @@ void Gameplay() {
             pacman.setDeltaTime(deltaTime);
             pacman.handleInput(mp.adjList, mp.pos);
             pacman.updateMovement(mp.adjList,mp.pos);
-            pacman.updateAnimation();
+            pacman.updateAnimation(ghosts,mp);
             pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
         }
 
@@ -97,29 +100,33 @@ void Gameplay() {
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 pacman.die();
-                int i = 0;
-                vector<int> starts = { 34,40,41,42 };
-                for (auto& ghost : ghosts) {
-                    ghost->reset(starts[i], mp.pos);
-                    i++;
-                }
             }
         }
+       
+        for (int i = 1; i <= 90; i++) {
+            if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+            if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
+                pacman.nodes[i].setScale(0,0);
+                score += 50;
+            }
+        }
+        cout << score << endl;
 
 
         window.clear();
         window.draw(MapSprite);
 
-        //for (int i = 1; i <= 92; i++) {
-          /*  window.draw(pacman.nodes[i]);
-            window.draw(nodeNums[i]);*/
-        //}
+        for (int i = 1; i <= 90; i++) {
+            if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+            window.draw(pacman.nodes[i]);
+            //window.draw(nodeNums[i]);
+        }
 
-        window.draw(pacmanSprite);
 
         for (auto& ghost : ghosts) {
             ghost->draw(window);
         }
+        window.draw(pacmanSprite);
         window.display();
     }
 }

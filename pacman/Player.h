@@ -41,11 +41,11 @@ public:
     void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos);
     void updateMovement(unordered_map<int, vector<int>> adj,vector<pair<int, int>>& pos);
     void updatePlace(Vector2f window);
-    void updateAnimation();
+    void updateAnimation(vector<Ghost*>& ghosts,Map &mp);
     void die();
     int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition);
 
 private:
     void resetAfterDeath();
-    void updateAnimationCounter(float speedThreshold);
+    void updateAnimationCounter(float speedThreshold, vector<Ghost*>& ghosts,Map &mp);
 };
