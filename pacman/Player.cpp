@@ -50,7 +50,7 @@ void Player::setDeltaTime(float dt) {
 
 
 void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-    if (!animation_running) {
+    if (!animation_running&& curr_state != dead) {
         if (Keyboard::isKeyPressed(moveLeftKey)) {
             cur_dir = left;
             tmp_state = amove;
@@ -77,88 +77,91 @@ void Player::updateMovement(unordered_map<int, vector<int>>& adj, vector<pair<in
 
     Vector2f currentPos = player.getPosition();
     float invert = 1;
-    for (int i = 1; i <= 64; i++) {
-        if (abs(pos[i].first - currentPos.x) < 3 && abs(pos[i].second - currentPos.y) < 3) {
-            int next_node = -1;
+    if (curr_state != dead) {
+        for (int i = 1; i <= 64; i++) {
+            if (abs(pos[i].first - currentPos.x) < 3 && abs(pos[i].second - currentPos.y) < 3) {
+                int next_node = -1;
 
-            if (tmp_state == wmove) {
-                for (int neighbor : adj[i]) {
-                    if (pos[neighbor].second < pos[i].second) {
-                        next_node = neighbor;
-                        invert = 1;
-                        break;
+                if (tmp_state == wmove) {
+                    for (int neighbor : adj[i]) {
+                        if (pos[neighbor].second < pos[i].second) {
+                            next_node = neighbor;
+                            invert = 1;
+                            break;
+                        }
                     }
                 }
-            }
-            else if (tmp_state == smove) {
-                for (int neighbor : adj[i]) {
-                    if (pos[neighbor].second > pos[i].second) {
-                        next_node = neighbor;
-                        invert = 1;
-                        break;
+                else if (tmp_state == smove) {
+                    for (int neighbor : adj[i]) {
+                        if (pos[neighbor].second > pos[i].second) {
+                            next_node = neighbor;
+                            invert = 1;
+                            break;
+                        }
                     }
                 }
-            }
-            else if (tmp_state == amove) {
-                if (i == 23) {
-                    next_node = 30;
-                    invert = -1;
-                    break;
-                }
-                for (int neighbor : adj[i]) {
-                    if (pos[neighbor].first < pos[i].first) {
-                        next_node = neighbor;
-                        invert = 1;
+                else if (tmp_state == amove) {
+                    if (i == 23) {
+                        next_node = 30;
+                        invert = -1;
                         break;
                     }
-                }
-            }
-            else if (tmp_state == dmove) {
-                if (i == 30) {
-                    next_node = 23;
-                    invert = -1;
-                    break;
-                }
-                for (int neighbor : adj[i]) {
-                    if (pos[neighbor].first > pos[i].first) {
-                        next_node = neighbor;
-                        invert = 1;
-                        break;
+                    for (int neighbor : adj[i]) {
+                        if (pos[neighbor].first < pos[i].first) {
+                            next_node = neighbor;
+                            invert = 1;
+                            break;
+                        }
                     }
                 }
-            }
-
-            if (next_node != -1) {
-                cur_node = next_node;
-                switch (tmp_state) {
-                case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
-                case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
-                case amove: velocity.x = -invert * walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
-                case dmove: velocity.x = invert * walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
-                default: break;
-                }
-                break;
-            }
-            else {
-                bool keepMoving = false;
-                for (int neighbor : adj[cur_node]) {
-                    if ((curr_state == wmove && pos[neighbor].second < pos[cur_node].second) ||
-                        (curr_state == smove && pos[neighbor].second > pos[cur_node].second) ||
-                        (curr_state == amove && pos[neighbor].first < pos[cur_node].first) ||
-                        (curr_state == dmove && pos[neighbor].first > pos[cur_node].first)) {
-                        keepMoving = true;
+                else if (tmp_state == dmove) {
+                    if (i == 30) {
+                        next_node = 23;
+                        invert = -1;
                         break;
+                    }
+                    for (int neighbor : adj[i]) {
+                        if (pos[neighbor].first > pos[i].first) {
+                            next_node = neighbor;
+                            invert = 1;
+                            break;
+                        }
                     }
                 }
 
-                if (!keepMoving) {
-                    velocity = { 0,0 };
+                if (next_node != -1) {
+                    cur_node = next_node;
+                    switch (tmp_state) {
+                    case wmove: velocity.y = -walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
+                    case smove: velocity.y = walk_speed * playerdeltatime, velocity.x = 0; curr_state = tmp_state; break;
+                    case amove: velocity.x = -invert * walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
+                    case dmove: velocity.x = invert * walk_speed * playerdeltatime, velocity.y = 0; curr_state = tmp_state; break;
+                    default: break;
+                    }
                     break;
+                }
+                else {
+                    bool keepMoving = false;
+                    for (int neighbor : adj[cur_node]) {
+                        if ((curr_state == wmove && pos[neighbor].second < pos[cur_node].second) ||
+                            (curr_state == smove && pos[neighbor].second > pos[cur_node].second) ||
+                            (curr_state == amove && pos[neighbor].first < pos[cur_node].first) ||
+                            (curr_state == dmove && pos[neighbor].first > pos[cur_node].first)) {
+                            keepMoving = true;
+                            break;
+                        }
+                    }
+
+                    if (!keepMoving) {
+                        velocity = { 0,0 };
+                        break;
+                    }
                 }
             }
         }
+        player.move(velocity);
+
     }
-    player.move(velocity);
 }
 
 void Player::updatePlace(Vector2f window) {
