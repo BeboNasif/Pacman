@@ -4,31 +4,24 @@
 #include <unordered_set>
 #include <algorithm>
 
-Ghost::Ghost(int startNode, const std::string& texturePath,
-    unordered_map<int, std::vector<int>> adjList,
-    const std::vector<std::pair<int, int>>& pos)
+unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
+
+Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>>& adjList, vector<pair<int, int>>& pos)
 {
     adjList[91].clear();
     adjList[92].clear();
     texture.loadFromFile(texturePath);
     sprite.setTexture(texture);
     sprite.setOrigin(8, 8);
-    sprite.setScale(3.5f, 3.5);
+    sprite.setScale(3.5f, 3.5f);
     currentNode = startNode;
     pathIndex = 0;
     elapsedTime = 0;
     speed = 150.f;
-
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
-
-    allPaths = precomputeAllPaths(adjList);
 }
 
-void Ghost::update(float deltaTime,
-    const std::unordered_map<int, std::vector<int>>& adjList,
-    const std::vector<std::pair<int, int>>& pos,
-    int pacmanNode)
-{
+void Ghost::update(float deltaTime,unordered_map<int,vector<int>>& adjList,vector<pair<int, int>>& pos,int pacmanNode){
     if (path.empty() || pathIndex + 1 >= path.size()) {
         // Recalculate path if possible
         if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
@@ -42,7 +35,7 @@ void Ghost::update(float deltaTime,
     Vector2f targetPos(pos[path[pathIndex + 1]].first, pos[path[pathIndex + 1]].second);
 
     Vector2f dir = targetPos - currentPos;
-    float distance = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+    float distance = sqrt(dir.x * dir.x + dir.y * dir.y);
 
     if (distance < speed * deltaTime) {
         sprite.setPosition(targetPos);
@@ -62,23 +55,22 @@ void Ghost::update(float deltaTime,
 
 
 
-void Ghost::draw(sf::RenderWindow& window) {
+void Ghost::draw(RenderWindow& window) {
     window.draw(sprite);
 }
 
-int Ghost::getCurrentNode() const {
+int Ghost::getCurrentNode()  {
     return currentNode;
 }
 
-std::unordered_map<int, std::unordered_map<int, std::vector<int>>>
-Ghost::precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjList)
+unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths( unordered_map<int, vector<int>>& adjList)
 {
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> allPaths;
+    unordered_map<int, unordered_map<int, vector<int>>> allPaths;
 
-    for (const auto& [start, _] : adjList) {
-        std::queue<int> q;
-        std::unordered_map<int, int> parent;
-        std::unordered_set<int> visited;
+    for ( auto& [start, _] : adjList) {
+        queue<int> q;
+        unordered_map<int, int> parent;
+        unordered_set<int> visited;
 
         q.push(start);
         visited.insert(start);
@@ -97,7 +89,7 @@ Ghost::precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjLi
             }
         }
 
-        for (const auto& [end, _] : parent) {
+        for ( auto& [end, _] : parent) {
             std::vector<int> path;
             int cur = end;
             while (cur != -1) {
@@ -111,11 +103,12 @@ Ghost::precomputeAllPaths(const std::unordered_map<int, std::vector<int>>& adjLi
 
     return allPaths;
 }
-const sf::Sprite& Ghost::getSprite() const {
+
+Sprite& Ghost::getSprite()  {
     return sprite;
 }
 
-void Ghost::reset(int startNode, const std::vector<std::pair<int, int>>& pos) {
+void Ghost::reset(int startNode,  std::vector<std::pair<int, int>>& pos) {
     path.clear();
     currentNode = startNode;
     pathIndex = 0;

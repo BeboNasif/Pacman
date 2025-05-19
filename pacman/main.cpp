@@ -28,12 +28,11 @@ void Gameplay() {
     mp.init();
     //mp.printAdjList();
 
-    Ghost redGhost(34, "Assets/red_ghost.png", mp.adjList, mp.pos);
-    Ghost pinkGhost(40, "Assets/pink_ghost.png", mp.adjList, mp.pos);
-    Ghost blueGhost(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
-    Ghost yellowGhost(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
-
-    std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
+    Ghost Adham(34, "Assets/red_ghost.png", mp.adjList, mp.pos);
+    Ghost Samir(40, "Assets/pink_ghost.png", mp.adjList, mp.pos);
+    Ghost Kareem(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
+    Ghost Ibrahim(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
+    std::vector<Ghost*> ghosts = { &Adham, &Samir, &Kareem, &Ibrahim };
 
     Player pacman(pacmanSprite);
 
@@ -58,6 +57,8 @@ void Gameplay() {
 
     Clock clock;
     srand(time(NULL));
+
+    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
 
     while (window.isOpen()) {
         float deltaTime = clock.restart().asSeconds();
