@@ -275,7 +275,7 @@ void Menu::Play_menu(RenderWindow& window)
     menu2.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
     menu2.Face_intilization();
 
-    static const std::string labels[3] = { "Single","Multi","Back" };
+    static const std::string labels[3] = { "Normal","Hard","Back" };
     float yOff = 40.f;
     float midY = window.getSize().y * 0.5f;
     for (int i = 0; i < 3; ++i) {
