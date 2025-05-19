@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include "Ghost.h"
 #include <map>
 #include "Map.h"
 #include <unordered_map>

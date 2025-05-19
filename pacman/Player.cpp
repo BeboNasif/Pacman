@@ -184,7 +184,7 @@ void Player::updatePlace(Vector2f window) {
 
 
 }
-void Player::updateAnimation() {
+void Player::updateAnimation(vector<Ghost*>& ghosts,Map &mp ) {
     if (curr_state == idle) {
         player.setTexture(Idle);
         ImageCounter = 0;
@@ -195,16 +195,16 @@ void Player::updateAnimation() {
         player.setTexture(animationTextures[curr_state][ImageCounter]);
 
         if (curr_state == dead)
-            updateAnimationCounter(0.07f);
+            updateAnimationCounter(0.07f, ghosts, mp);
         else
-            updateAnimationCounter(0.08f);
+            updateAnimationCounter(0.08f,ghosts,mp);
     }
 
 
 }
 
 
-void Player::updateAnimationCounter(float speedThreshold) {
+void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts, Map &mp) {
     AnimationCounter += playerdeltatime;
     if (AnimationCounter >= speedThreshold) {
         AnimationCounter = 0;
@@ -216,6 +216,12 @@ void Player::updateAnimationCounter(float speedThreshold) {
                     live--;
                     cout << live << endl;
                     resetAfterDeath();
+                    int i = 0;
+                    vector<int> starts = { 34,40,41,42 };
+                    for (auto& ghost : ghosts) {
+                        ghost->reset(starts[i], mp.pos);
+                        i++;
+                    }
                 }
                 else {
                     cout << "Game Over" << endl;

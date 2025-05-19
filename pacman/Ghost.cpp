@@ -1,12 +1,12 @@
-#include "Ghost.h"
+﻿#include "Ghost.h"
 #include <cmath>
 #include <queue>
 #include <unordered_set>
 #include <algorithm>
 
-unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
-
-Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>>& adjList, vector<pair<int, int>>& pos)
+Ghost::Ghost(int startNode, const std::string& texturePath,
+    unordered_map<int, std::vector<int>> adjList,
+    const std::vector<std::pair<int, int>>& pos)
 {
     adjList[91].clear();
     adjList[92].clear();
@@ -18,6 +18,7 @@ Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>>&
     pathIndex = 0;
     elapsedTime = 0;
     speed = 150.f;
+
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
 }
 
@@ -41,18 +42,37 @@ void Ghost::update(float deltaTime,unordered_map<int,vector<int>>& adjList,vecto
         sprite.setPosition(targetPos);
         currentNode = path[pathIndex + 1];
         pathIndex++;
-
-        if (allPaths.count(currentNode) && allPaths.at(currentNode).count(pacmanNode)) {
-            path = allPaths[currentNode][pacmanNode];
-            pathIndex = 0;
-        }
     }
     else {
         dir /= distance;
+        lastDir = dir; // track direction
         sprite.move(dir * speed * deltaTime);
     }
+    updateAnimation(); // 👈 Add this here
+
 }
 
+void Ghost::updateAnimation() 
+{
+    animationTimer += animationSpeed;
+    if (animationTimer >= 1.f) {
+        animationTimer = 0.f;
+        animationFrame = (animationFrame + 1) % 2;
+    }
+
+    int row = 0;
+    if (std::abs(lastDir.x) > std::abs(lastDir.y)) {
+        row = lastDir.x > 0 ? 0 : 1;
+    }
+    else {
+        row = lastDir.y < 0 ? 2 : 3;
+    }
+
+    int frameIndex = row * 2 + animationFrame;
+    int frameX = (frameIndex % 8) * 16;
+
+    sprite.setTextureRect(sf::IntRect(frameX, 0, 16, 16));
+}
 
 
 void Ghost::draw(RenderWindow& window) {
