@@ -1,14 +1,13 @@
 ﻿#include <cmath>
 #include <queue>
+#include <algorithm>
 #include <unordered_set>
 #include <algorithm>
+#include "include.h"
 #include "Ghost.h"
-std::unordered_map<int, std::unordered_map<int, std::vector<int>>> Ghost::allPaths;
+unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
 
 Ghost::Ghost(int startNode, string texturePath,unordered_map<int, vector<int>> adjList,vector<pair<int, int>> pos) {
-
-    adjList[91].clear();
-    adjList[92].clear();
 
     texture.loadFromFile(texturePath);
     sprite.setTexture(texture);
@@ -29,21 +28,28 @@ Ghost::Ghost(int startNode, string texturePath,unordered_map<int, vector<int>> a
 
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
 
-    allPaths = precomputeAllPaths(adjList);
 }
 
-
-void Ghost::update(float deltaTime,unordered_map<int, vector<int>>& adjList,vector<pair<int, int>>& pos,int pacmanNode)
+void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
 {
-    if (path.empty() || pathIndex + 1 >= path.size()) {
+    Vector2f currentPos = sprite.getPosition();
+    Vector2f nodePos(pos[currentNode].first, pos[currentNode].second);
+
+    // Check if ghost is exactly on a node (within small epsilon margin)
+    float epsilon = 0.1f;
+    if (abs(currentPos.x - nodePos.x) < epsilon && abs(currentPos.y - nodePos.y) < epsilon) {
+        sprite.setPosition(nodePos); // Snap exactly to node
+        // Only update path when standing on a node
         if (allPaths.count(currentNode) && allPaths[currentNode].count(pacmanNode)) {
             path = allPaths[currentNode][pacmanNode];
             pathIndex = 0;
         }
-        return;
     }
 
-    Vector2f currentPos = sprite.getPosition();
+    // Prevent crash if no further movement in path
+    if (pathIndex + 1 >= path.size())
+        return;
+
     Vector2f targetPos(pos[path[pathIndex + 1]].first, pos[path[pathIndex + 1]].second);
 
     Vector2f dir = targetPos - currentPos;
@@ -59,6 +65,7 @@ void Ghost::update(float deltaTime,unordered_map<int, vector<int>>& adjList,vect
         lastDir = dir;
         sprite.move(dir * speed * deltaTime);
     }
+
     updateAnimation();
 }
 
@@ -92,8 +99,10 @@ int Ghost::getCurrentNode() {
     return currentNode;
 }
 
-unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(unordered_map<int, vector<int>>& adjList)
+unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(unordered_map<int, vector<int>> adjList)
 {
+    adjList[91].clear();
+    adjList[92].clear();
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
 
     for (auto& start_pair : adjList) {
@@ -154,8 +163,24 @@ int Ghost::Amoor(int pacmanNode) {
     else {
         int mn = 100;
         int target = pacmanNode;
+        int mnToPacNode = 100;
+        int pacmanclosestnode = pacmanNode;
+        for (auto x : corners) {
+            if (allPaths[pacmanNode][x].size() < mnToPacNode) {
+                mnToPacNode = allPaths[pacmanNode][x].size(), pacmanclosestnode = x;
+            }
+        }
+        int pacmanclosest2 = pacmanNode;
+        mnToPacNode = 100;
+
+        for (auto x : corners) {
+            if (allPaths[pacmanNode][x].size() < mnToPacNode and x != pacmanclosestnode) {
+                mnToPacNode = allPaths[pacmanNode][x].size(), pacmanclosest2 = x;
+            }
+        }
+        
         for (auto x : corners)
-            if (allPaths[currentNode][x].size() < mn and currentNode != x)
+            if (allPaths[currentNode][x].size() < mn and x != pacmanclosest2 and x != currentNode and x!= pacmanclosestnode)
                 mn = allPaths[currentNode][x].size(), target = x;
 
         return target;

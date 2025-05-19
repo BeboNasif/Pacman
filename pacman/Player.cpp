@@ -27,7 +27,7 @@ Player::Player(Sprite& p) : player(p) {
     maximagecounter = 0;
     AnimationCounter = 0;
     cur_dir = left;
-    cur_node = 45;
+    cur_node = 65; 
     animationTextures[wmove] = vector<Texture>(2);
     animationTextures[smove] = vector<Texture>(2);
     animationTextures[amove] = vector<Texture>(2);
@@ -51,7 +51,7 @@ void Player::setDeltaTime(float dt) {
 
 
 void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-    if (!animation_running&& curr_state != dead) {
+    if (!animation_running && curr_state != dead) {
         if (Keyboard::isKeyPressed(moveLeftKey)) {
             cur_dir = left;
             tmp_state = amove;

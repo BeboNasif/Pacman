@@ -1,4 +1,4 @@
-﻿
+﻿#include <random>
 #include "Menu.h"
 #include "menu_Bg.h"
 #include "Player.h"
@@ -12,7 +12,7 @@ Sounds sound;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[95];
-
+float timer = 0;
 void Gameplay() {
     int score = 0;
     Sprite pacmanSprite;
@@ -56,21 +56,45 @@ void Gameplay() {
         c.setFillColor(Color::Yellow);
         auto cur = mp.pos[i];
         Vector2f v(cur.first, cur.second);
-
         Text node;
-        node.setFont(fnt);
+        node.setFont(fnt2);
         node.setPosition(v);
         node.setString(to_string(i));
         node.setCharacterSize(30);
         node.setFillColor(Color::Blue);
         nodeNums[i] = node;
         c.setPosition(v);
-
         pacman.nodes[i] = c;
     }
-    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
+    
+    vector<int> PowerUpNodes(4);
+    
+    random_device rd;
+    mt19937 gen(rd()); 
+    uniform_int_distribution<> dis1(0, 14), dis2(0, 19);
 
-    Clock clock;
+    vector<int> upperleft,upperright,lowerleft,lowerright;
+    for (int i = 0; i <= 2; i++)
+        for (int j = 1; j <= 5; j++)
+            upperleft.push_back(10 * i + j ), upperright.push_back(10 * i + j + 5);
+    
+    for (int i = 5; i <= 8; i++)
+        for (int j = 1; j <= 5; j++)
+            lowerleft.push_back(10 * i + j), lowerright.push_back(10 * i + j + 5);
+  
+    PowerUpNodes[0] = upperleft[dis1(gen)];
+    PowerUpNodes[1] = upperright[dis1(gen)];
+    PowerUpNodes[2] = lowerright[dis2(gen)];
+    PowerUpNodes[3] = lowerleft[dis2(gen)];
+   
+    for (auto it : PowerUpNodes) {
+        pacman.nodes[it].setRadius(15);
+        pacman.nodes[it].setFillColor({255,165,0});
+        pacman.nodes[it].setOrigin(15,15);
+    }
+
+    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
+    Clock clock, clock2;
     srand(time(NULL));
 
     while (window.isOpen()) {
@@ -84,6 +108,12 @@ void Gameplay() {
                 return;
         }
 
+        if (clock2.getElapsedTime().asSeconds() >= 1) {
+            timer++;
+            clock2.restart();
+        }
+        
+
         if (!pacman.gameOver) {
             pacman.setDeltaTime(deltaTime);
             pacman.handleInput(mp.adjList, mp.pos);
@@ -93,41 +123,49 @@ void Gameplay() {
         }
 
         Vector2f pacmanPosition = pacmanSprite.getPosition();
+        
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
-
-
         for (int i = 0; i < 4;i++) {
-
             if ((!pacman.gameOver or !pacman.isDead) and pacman.curr_state) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
                 if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList);
                 if (i == 2)  target = ghosts[i]->Amoor(pacmanNode);
                 if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList);
-                ghosts[i]->update(deltaTime, mp.adjList, mp.pos, target);
+                
+                if (i == 0) ghosts[i]->update(deltaTime, mp.pos, target);
+                if(i == 1 and timer > 5) ghosts[i]->update(deltaTime, mp.pos, target);
+                if( i== 2 and timer > 10) ghosts[i]->update(deltaTime, mp.pos, target);
+                if(i == 3 and timer > 15) ghosts[i]->update(deltaTime, mp.pos, target);
             }
         }
 
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 pacman.die();
+                timer = 0;
             }
         }
 
         for (int i = 1; i <= 90; i++) {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+          
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
+                if (i == PowerUpNodes[0] or i == PowerUpNodes[1] or i == PowerUpNodes[2] or i == PowerUpNodes[3]) {
+                    // neek el dnya hena
+
+                    pacman.walk_speed = 250;
+                }
                 pacman.nodes[i].setScale(0, 0);
                 score += 20;
             }
         }
-        //cout << score << endl;
         Score.setString("Score");
         ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
 
-        for (int i = 1; i <= 90; i++) {
+        for (int i = 1; i <= 92; i++) {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
             window.draw(pacman.nodes[i]);
             //window.draw(nodeNums[i]);

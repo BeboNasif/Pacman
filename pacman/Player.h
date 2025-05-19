@@ -9,7 +9,7 @@ private:
     enum State { idle, wmove, smove, amove, dmove, dead };
     Sprite& player;
     float playerdeltatime;
-    float walk_speed;
+  
     float player_scale;
     Vector2f velocity;
     Vector2f initial_position;
@@ -26,6 +26,7 @@ private:
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
+    float walk_speed;
     CircleShape nodes[93];
     enum Dir { up, down, right, left };
     Dir cur_dir;

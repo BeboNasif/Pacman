@@ -25,10 +25,10 @@ public:
 
     static unordered_map<int, unordered_map<int, vector<int>>> allPaths;
     Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> adjList, vector<pair<int, int>> pos);
-    void update(float deltaTime, unordered_map<int, vector<int>>& adjList, vector<pair<int, int>>& pos, int pacmanNode);
+    void update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode);
     void draw(RenderWindow& window);
     int getCurrentNode();
-    static unordered_map<int, unordered_map<int, vector<int>>> precomputeAllPaths(unordered_map<int, vector<int>>& adjList);
+    static unordered_map<int, unordered_map<int, vector<int>>> precomputeAllPaths(unordered_map<int, vector<int>> adjList);
     Sprite& getSprite() ;
     void reset(int startNode,  vector<pair<int, int>>& pos);
 
