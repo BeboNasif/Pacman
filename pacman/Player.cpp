@@ -261,3 +261,4 @@ int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f p
     }
     return closestNode;
 }
+

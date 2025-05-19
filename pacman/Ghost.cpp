@@ -124,3 +124,11 @@ void Ghost::reset(int startNode, const std::vector<std::pair<int, int>>& pos) {
     pathIndex = 0;
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
 }
+
+int Ghost::Ad3k(int pacmanNode) {
+    return pacmanNode;
+}
+
+int Ghost::EL7okooma(int pacmanNode) {
+    //huuh
+}
