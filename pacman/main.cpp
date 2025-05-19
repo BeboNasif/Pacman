@@ -68,6 +68,7 @@ void Gameplay() {
 
         pacman.nodes[i] = c;
     }
+    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
 
     Clock clock;
     srand(time(NULL));
