@@ -28,10 +28,10 @@ void Gameplay() {
     mp.init();
     //mp.printAdjList();
 
-    Ghost redGhost(34, "Assets/red_ghost.png", mp.adjList, mp.pos);
-    Ghost pinkGhost(40, "Assets/pink_ghost.png", mp.adjList, mp.pos);
-    Ghost blueGhost(41, "Assets/blue_ghost.png", mp.adjList, mp.pos);
-    Ghost yellowGhost(42, "Assets/yellow_ghost.png", mp.adjList, mp.pos);
+    Ghost redGhost(34, "Assets/red.png", mp.adjList, mp.pos);
+    Ghost pinkGhost(40, "Assets/pink.png", mp.adjList, mp.pos);
+    Ghost blueGhost(41, "Assets/cyan.png", mp.adjList, mp.pos);
+    Ghost yellowGhost(42, "Assets/yellow.png", mp.adjList, mp.pos);
 
     std::vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 

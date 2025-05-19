@@ -8,6 +8,12 @@ using namespace std;
 
 class Ghost {
 private:
+    int animationFrame;
+    float animationTimer;
+    float animationSpeed;
+    sf::Vector2f lastDir;
+    void updateAnimation();
+
     sf::Texture texture;
     sf::Sprite sprite;
     float speed;
