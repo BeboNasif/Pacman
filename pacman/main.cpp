@@ -13,6 +13,7 @@ RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[95];
 float timer = 0;
+
 void Gameplay() {
     int score = 0;
     Sprite pacmanSprite;
@@ -34,6 +35,9 @@ void Gameplay() {
     Ghost pinkGhost(40, "Assets/pink.png", mp.adjList, mp.pos);
     Ghost blueGhost(41, "Assets/cyan.png", mp.adjList, mp.pos);
     Ghost yellowGhost(42, "Assets/yellow.png", mp.adjList, mp.pos);
+    sf::Texture poisonedTexture;
+    poisonedTexture.loadFromFile("Assets/poisoned.png");
+
 
     vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 
@@ -66,31 +70,31 @@ void Gameplay() {
         c.setPosition(v);
         pacman.nodes[i] = c;
     }
-    
+
     vector<int> PowerUpNodes(4);
-    
+
     random_device rd;
-    mt19937 gen(rd()); 
+    mt19937 gen(rd());
     uniform_int_distribution<> dis1(0, 14), dis2(0, 19);
 
-    vector<int> upperleft,upperright,lowerleft,lowerright;
+    vector<int> upperleft, upperright, lowerleft, lowerright;
     for (int i = 0; i <= 2; i++)
         for (int j = 1; j <= 5; j++)
-            upperleft.push_back(10 * i + j ), upperright.push_back(10 * i + j + 5);
-    
+            upperleft.push_back(10 * i + j), upperright.push_back(10 * i + j + 5);
+
     for (int i = 5; i <= 8; i++)
         for (int j = 1; j <= 5; j++)
             lowerleft.push_back(10 * i + j), lowerright.push_back(10 * i + j + 5);
-  
+
     PowerUpNodes[0] = upperleft[dis1(gen)];
     PowerUpNodes[1] = upperright[dis1(gen)];
     PowerUpNodes[2] = lowerright[dis2(gen)];
     PowerUpNodes[3] = lowerleft[dis2(gen)];
-   
+
     for (auto it : PowerUpNodes) {
         pacman.nodes[it].setRadius(15);
-        pacman.nodes[it].setFillColor({255,165,0});
-        pacman.nodes[it].setOrigin(15,15);
+        pacman.nodes[it].setFillColor({ 255,165,0 });
+        pacman.nodes[it].setOrigin(15, 15);
     }
 
     Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
@@ -108,11 +112,11 @@ void Gameplay() {
                 return;
         }
 
-        if (clock2.getElapsedTime().asSeconds() >= 1) {
+        if (clock2.getElapsedTime().asSeconds() >= 1 && pacman.curr_state != 0) {
             timer++;
             clock2.restart();
         }
-        
+
 
         if (!pacman.gameOver) {
             pacman.setDeltaTime(deltaTime);
@@ -123,38 +127,58 @@ void Gameplay() {
         }
 
         Vector2f pacmanPosition = pacmanSprite.getPosition();
-        
+
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
         for (int i = 0; i < 4;i++) {
-            if ((!pacman.gameOver or !pacman.isDead) and pacman.curr_state) {
+
+            if ((!pacman.gameOver && !pacman.isDead && pacman.curr_state) && ghosts[i]->shouldUpdate(i, timer)) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
                 if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList);
-                if (i == 2)  target = ghosts[i]->Amoor(pacmanNode);
+                if (i == 2) target = ghosts[i]->Amoor(pacmanNode);
                 if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList);
-                
-                if (i == 0) ghosts[i]->update(deltaTime, mp.pos, target);
-                if(i == 1 and timer > 5) ghosts[i]->update(deltaTime, mp.pos, target);
-                if( i== 2 and timer > 10) ghosts[i]->update(deltaTime, mp.pos, target);
-                if(i == 3 and timer > 15) ghosts[i]->update(deltaTime, mp.pos, target);
+
+                ghosts[i]->ghostOut = 1;
+
+                if (ghosts[i]->isDead)
+                {
+                    target = 40 + (rand() % 3);
+					score += 100;
+                }
+                else if (ghosts[i]->isPoisoned) {
+                    target = 1 + rand() % 90;
+					//cout << "target is: " << target << endl;
+                }
+                ghosts[i]->update(deltaTime, mp.pos, target);
+
             }
         }
 
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
-                pacman.die();
-                timer = 0;
+                if (ghost->isPoisoned) {
+                    ghost->die("Assets/DEAD2.png");
+
+                }
+                else {
+                    pacman.die();
+                    timer = 0;
+                }
             }
         }
 
         for (int i = 1; i <= 90; i++) {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
-          
+
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
                 if (i == PowerUpNodes[0] or i == PowerUpNodes[1] or i == PowerUpNodes[2] or i == PowerUpNodes[3]) {
-                    // neek el dnya hena
+                    for (auto& ghost : ghosts) {
+                        if (ghost->ghostOut == 1)
+                            ghost->poisoned("Assets/poisoned.png");
+                    }
 
-                    pacman.walk_speed = 250;
+                    pacman.walk_speed += 50;
+                    cout << "speed : " << pacman.walk_speed;
                 }
                 pacman.nodes[i].setScale(0, 0);
                 score += 20;
@@ -168,7 +192,7 @@ void Gameplay() {
         for (int i = 1; i <= 92; i++) {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
             window.draw(pacman.nodes[i]);
-            //window.draw(nodeNums[i]);
+            window.draw(nodeNums[i]);
         }
 
 
