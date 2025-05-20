@@ -60,13 +60,13 @@ void Gameplay() {
         c.setFillColor(Color::Yellow);
         auto cur = mp.pos[i];
         Vector2f v(cur.first, cur.second);
-        Text node;
+        /*Text node;
         node.setFont(fnt2);
         node.setPosition(v);
         node.setString(to_string(i));
         node.setCharacterSize(30);
         node.setFillColor(Color::Blue);
-        nodeNums[i] = node;
+        nodeNums[i] = node;*/
         c.setPosition(v);
         pacman.nodes[i] = c;
     }
@@ -143,7 +143,7 @@ void Gameplay() {
                 if (ghosts[i]->isDead)
                 {
                     target = 40 + (rand() % 3);
-					score += 100;
+					
                 }
                 else if (ghosts[i]->isPoisoned) {
                     target = 1 + rand() % 90;
@@ -157,8 +157,7 @@ void Gameplay() {
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 if (ghost->isPoisoned) {
-                    ghost->die("Assets/DEAD2.png");
-
+                    if(!ghost->isDead) ghost->die("Assets/DEAD2.png",score);
                 }
                 else {
                     pacman.die();

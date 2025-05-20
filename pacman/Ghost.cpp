@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "include.h"
 #include "Ghost.h"
+#include "Player.h"
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
 
 Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> adjList, vector<pair<int, int>> pos) {
@@ -317,9 +318,10 @@ bool Ghost::shouldUpdate(int i, float timer) {
     return (isPoisoned || ghostOut || (i == 0) || (i == 1 && timer > 5) || (i == 2 && timer > 10) || (i == 3 && timer > 15));
 }
 
-void Ghost::die(const string& deadTexturePath) {
-
+void Ghost::die(const string& deadTexturePath, int& score) {
+    
     isDead = 1;
+    score += 50;
     deadTexture.loadFromFile(deadTexturePath);
     deadSprite.setTexture(deadTexture);
     deadSprite.setTextureRect(IntRect(0, 0, 16, 16));

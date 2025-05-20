@@ -48,5 +48,5 @@ public:
     int Amoor(int pacmanNode); //afraid one (runs to corners when near pacman) 
     int Ad3k(int pacmanNode); // red (  ad3k >:)  )
     void poisoned(const string& poisonedTexturePath);
-    void die(const string& deadTexturePath);
+    void die(const string& deadTexturePath, int& score);
 };

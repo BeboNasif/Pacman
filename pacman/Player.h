@@ -26,6 +26,7 @@ private:
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
+    
     float walk_speed;
     CircleShape nodes[93];
     enum Dir { up, down, right, left };
