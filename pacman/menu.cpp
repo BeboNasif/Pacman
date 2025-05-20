@@ -389,10 +389,6 @@ void  Menu::GFX(RenderWindow& window)
                 if (event.key.code == Keyboard::Up)
                     menu5.MoveUp(menu5.selected, 2);
 
-                if (event.key.code == Keyboard::Enter) {
-                    if (menu5.selected == 0) Gameplay();
-                    else if (menu5.selected == 1) Gameplay();
-                }
             }
             if (menu5.selected == 0)
             {

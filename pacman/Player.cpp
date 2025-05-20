@@ -12,7 +12,7 @@ extern int character;
 Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
-    player_scale = (character == 1 ? 2.2 : 2.0);
+    player_scale = (character == 1 ? 2.3 : 2.0);
     reachedNode = 1;
     initial_position = { 880 + 20,789 + 20 };
     curr_state = idle;
