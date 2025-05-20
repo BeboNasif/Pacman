@@ -8,9 +8,9 @@ public:
     Menu();
     void menu1(RenderWindow& window);
     void Play_menu(RenderWindow& window);
+    void GFX(RenderWindow& window);
 	void sound_options(RenderWindow& window);
     void player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey);
-    void control_menu(RenderWindow& window);
     void options_menu(RenderWindow& window);
 	void credits(RenderWindow& window);
 	void instructions(RenderWindow& window);
@@ -50,5 +50,4 @@ private:
     // ——— Timing & layout ———
     Clock deltaClock;
     float positionOfFace;
-    int pageNumber;
 };

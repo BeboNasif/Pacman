@@ -7,19 +7,19 @@ Keyboard::Key moveLeftKey = Keyboard::Left;
 Keyboard::Key moveRightKey = Keyboard::Right;
 Keyboard::Key moveUpkey = Keyboard::Up;
 Keyboard::Key moveDownkey = Keyboard::Down;
+extern int character;
 
 Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
-    player_scale = 2.0;
+    player_scale = (character == 1 ? 2.2 : 2.0);
     reachedNode = 1;
     initial_position = { 880 + 20,789 + 20 };
     curr_state = idle;
     tmp_state = idle;
     player.setScale(player_scale, player_scale);
-    player.setPosition(initial_position);
-    Idle.loadFromFile("Assets/Textures/pacman/neutral.png");
-
+    player.setPosition(initial_position); 
+    Idle.loadFromFile("Assets/Textures/pacman/neutral" + string(character == 1 ? "_m" : "") + ".png");
     live = 2;
     animation_running = false;
     isDead = false;
@@ -28,6 +28,7 @@ Player::Player(Sprite& p) : player(p) {
     AnimationCounter = 0;
     cur_dir = left;
     cur_node = 65; 
+
     animationTextures[wmove] = vector<Texture>(2);
     animationTextures[smove] = vector<Texture>(2);
     animationTextures[amove] = vector<Texture>(2);
@@ -35,10 +36,10 @@ Player::Player(Sprite& p) : player(p) {
     animationTextures[dead] = vector<Texture>(11);
 
     for (int i = 0; i < 2; i++) {
-        animationTextures[wmove][i].loadFromFile("Assets/Textures/pacman/up_" + to_string(i) + ".png");
-        animationTextures[smove][i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + ".png");
-        animationTextures[amove][i].loadFromFile("Assets/Textures/pacman/left_" + to_string(i) + ".png");
-        animationTextures[dmove][i].loadFromFile("Assets/Textures/pacman/right_" + to_string(i) + ".png");
+        animationTextures[wmove][i].loadFromFile("Assets/Textures/pacman/up_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
+        animationTextures[smove][i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + (character == 1 ? "m":"") + ".png");
+        animationTextures[amove][i].loadFromFile("Assets/Textures/pacman/left_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
+        animationTextures[dmove][i].loadFromFile("Assets/Textures/pacman/right_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
     }
     for (int i = 0; i < 11; i++) {
         animationTextures[dead][i].loadFromFile("Assets/Textures/pacman/d-" + to_string(i) + ".png");

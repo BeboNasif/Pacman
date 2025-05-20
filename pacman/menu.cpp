@@ -9,6 +9,7 @@ bool esc_button = false;
 int P_M_Sound = 100;
 int P_M_Music = 100;
 extern Sounds sound;
+int character = 0;
 
 bool waitingForKey = false;
 int actionToChange;
@@ -27,7 +28,6 @@ Menu::Menu()
     , delayStarted(false)
     , positionOfFace(60.f)
     , frameDuration(seconds(0.1f))
-    , pageNumber(0)
 {
     mainmenu.reserve(10);
     faceFrames.reserve(3);
@@ -207,7 +207,6 @@ void Menu::menu1(RenderWindow& window)
 
     Face_intilization();
     deltaClock.restart();
-    pageNumber = 1000;
 
     while (window.isOpen()) {
         Event evt;
@@ -234,8 +233,10 @@ void Menu::menu1(RenderWindow& window)
                         options_menu(window);
                     if (selected == 5)
                         credits(window);
-                    if (selected == 6)
-                        pageNumber = -1;
+                    if (selected == 6) {
+                        window.close();
+                        break;
+                    }
                 }
                 if (evt.key.code == Keyboard::Escape) {
                     mainmenu[selected].setFillColor(Color::White);
@@ -244,11 +245,6 @@ void Menu::menu1(RenderWindow& window)
                     Face.setPosition(Face.getPosition().x, midY + 7 * positionOfFace-15);
                 }
             }
-        }
-
-        if (pageNumber == -1) {
-            window.close();
-            break;
         }
 
         float dt = deltaClock.restart().asSeconds();
@@ -278,7 +274,7 @@ void Menu::Play_menu(RenderWindow& window)
     static const std::string labels[3] = { "Normal","Hard","Back" };
     float yOff = 40.f;
     float midY = window.getSize().y * 0.5f;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < menu2.choises; ++i) {
         menu2.mainmenu[i].setFont(menu2.font);
         menu2.mainmenu[i].setCharacterSize(50);
         menu2.mainmenu[i].setString(labels[i]);
@@ -290,8 +286,7 @@ void Menu::Play_menu(RenderWindow& window)
     }
 
     menu2.deltaClock.restart();
-    menu2.pageNumber = 500;
-
+    
     while (window.isOpen()) {
         Event evt;
         while (window.pollEvent(evt)) {
@@ -338,6 +333,112 @@ void Menu::Play_menu(RenderWindow& window)
     }
 }
 
+void  Menu::GFX(RenderWindow& window)
+{
+    Menu menu5;
+    menu5.choises = 2;
+    menu5.selected = 0;
+    menu5.mainmenu.resize(2);
+    menu5.Face_intilization();
+    menu5.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
+    static const std::string labels[2] = { "Charchters <>","Back" };
+    float yOff = 40.f;
+    float midY = window.getSize().y * 0.5f;
+    for (int i = 0; i < menu5.choises; ++i) {
+        menu5.mainmenu[i].setFont(menu5.font);
+        menu5.mainmenu[i].setCharacterSize(50);
+        menu5.mainmenu[i].setString(labels[i]);
+        menu5.mainmenu[i].setPosition(820, midY + yOff);
+        menu5.mainmenu[i].setFillColor(i == 0
+            ? Color{ 255,204,0 }
+        : Color::White);
+        yOff += menu5.positionOfFace;
+    }
+    const int players = 2;
+    Texture pl[players];
+    pl[0].loadFromFile("Assets/Textures/pacman/1.png");
+    pl[1].loadFromFile("Assets/Textures/pacman/left_0m.png");
+
+    Sprite chara;
+    menu5.deltaClock.restart();
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == event.Closed)
+                window.close();
+            if (event.type == Event::KeyReleased)
+                pressed = false;
+            if (event.type == Event::KeyPressed && !pressed) {
+                pressed = true;
+
+                if ((event.key.code == Keyboard::Enter && menu5.selected == 1) || (event.key.code == Keyboard::Escape && menu5.selected == 1))
+                {
+                    return;
+                }
+                if (event.key.code == Keyboard::Escape) {
+                    menu5.mainmenu[menu5.selected].setFillColor(Color::White);
+                    menu5.selected = 1;
+                    menu5.mainmenu[1].setFillColor(Color{ 255,204,0 });
+                    menu5.Face.setPosition(menu5.Face.getPosition().x, midY + 2 * positionOfFace - 15);
+                }
+                if (event.key.code == Keyboard::Down)
+                    menu5.MoveDown(menu5.selected, 2);
+                if (event.key.code == Keyboard::Up)
+                    menu5.MoveUp(menu5.selected, 2);
+
+                if (event.key.code == Keyboard::Enter) {
+                    if (menu5.selected == 0) Gameplay();
+                    else if (menu5.selected == 1) Gameplay();
+                }
+            }
+            if (menu5.selected == 0)
+            {
+                if (Keyboard::isKeyPressed(Keyboard::Left))
+                {
+                    if (character > 0)
+                        character--;
+                    else
+                        character = players - 1;
+                }
+                if (Keyboard::isKeyPressed(Keyboard::Right))
+                {
+                    if (character < players - 1)
+                        character++;
+                    else
+                        character = 0;
+                }
+            }
+        }
+        float dt = menu5.deltaClock.restart().asSeconds();
+        menu5.updateFaces(dt);
+
+        if (character == 0)
+        {
+            chara.setTexture(pl[0]);
+        }
+        else if (character == 1)
+        {
+            chara.setTexture(pl[1]);
+        }
+
+        chara.setScale(2.4, 2.4);
+        chara.setPosition(1200, midY+50);
+
+        window.clear();
+        menu_UI.back_ground(window);
+        window.draw(menu_UI.bg);
+        for (auto& t : menu5.mainmenu)  window.draw(t);
+        window.draw(menu5.Face);
+        for (auto& p : menu5.pills)     window.draw(p);
+        window.draw(menu5.DownFace);
+        window.draw(chara);
+        window.display();
+    }
+}
+
 void Menu::sound_options(RenderWindow& window)
 {
     Menu menu6;
@@ -376,7 +477,6 @@ void Menu::sound_options(RenderWindow& window)
     barMusic.setPosition(1005, midY + 2 * menu6.positionOfFace);
 
     menu6.deltaClock.restart();
-    menu6.pageNumber = 1000;
 
     while (window.isOpen())
     {
@@ -582,81 +682,6 @@ void Menu::player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Key
     }
 }
 
-void Menu::control_menu(RenderWindow& window)
-{
-    Menu menu8;
-    menu8.Face_intilization();
-    menu8.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
-    menu8.choises = 3;
-    menu8.mainmenu.resize(menu8.choises);
-
-    static const std::string labels[3] = { "Player 1", "Player 2", "Back" };
-    float yOffset = 40.f;
-    float midY = window.getSize().y * 0.5f;
-
-    for (int i = 0; i < 3; ++i)
-    {
-        menu8.mainmenu[i].setFont(menu8.font);
-        menu8.mainmenu[i].setCharacterSize(50);
-        menu8.mainmenu[i].setString(labels[i]);
-        menu8.mainmenu[i].setPosition(820, midY + yOffset);
-        menu8.mainmenu[i].setFillColor(i == 0 ? Color{ 255, 204, 0 } : Color::White);
-        yOffset += menu8.positionOfFace;
-    }
-
-    while (window.isOpen())
-    {
-        Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == Event::Closed)
-                window.close();
-
-            if (event.type == Event::KeyReleased)
-                pressed = false;
-
-            if (event.type == Event::KeyPressed && !pressed)
-            {
-                if (event.key.code == Keyboard::Down)
-                    menu8.MoveDown(menu8.selected, menu8.choises);
-                else if (event.key.code == Keyboard::Up)
-                    menu8.MoveUp(menu8.selected, menu8.choises);
-                else if (event.key.code == Keyboard::Escape && menu8.selected != 2)
-                {
-                    menu8.mainmenu[menu8.selected].setFillColor(Color::White);
-                    menu8.selected = 2;
-                    menu8.mainmenu[2].setFillColor(Color{ 255, 204, 0 });
-                    menu8.Face.setPosition(menu8.Face.getPosition().x, midY + 3 * menu8.positionOfFace - 15);
-					pressed = true;
-                }
-                if (((event.key.code == Keyboard::Enter && menu8.selected == 2) || (event.key.code == Keyboard::Escape && menu8.selected == 2))&& !pressed)
-                {
-                    pageNumber = 1000;
-                    return;
-                }
-                else if (event.key.code == Keyboard::Enter)
-                {
-                    pressed = true;
-                    if (menu8.selected == 0)  player_controls(window, moveLeftKey, moveRightKey, moveUpkey, moveDownkey);
-                    // else if (menu8.selected == 1)  player_controls(window, moveLeftKey2, moveRightKey2, jumpKey2); // For Player 2 in the future
-                }
-            }
-        }
-
-        float dt = menu8.deltaClock.restart().asSeconds();
-        menu8.updateFaces(dt);
-
-        window.clear();
-        menu_UI.back_ground(window);
-        window.draw(menu_UI.bg);
-        for (auto& t : menu8.mainmenu) window.draw(t);
-        window.draw(menu8.Face);
-        for (auto& p : menu8.pills)    window.draw(p);
-        window.draw(menu8.DownFace);
-        window.display();
-    }
-}
-
 void Menu::options_menu(RenderWindow& window)
 {
     Menu menu4;
@@ -689,7 +714,6 @@ void Menu::options_menu(RenderWindow& window)
     }
 
     menu4.deltaClock.restart();
-    menu4.pageNumber = 1000;
 
     while (window.isOpen())
     {
@@ -730,9 +754,9 @@ void Menu::options_menu(RenderWindow& window)
                 if (event.key.code == Keyboard::Enter
                     || (event.key.code == Keyboard::Escape && menu4.selected == 3))
                 {
-                    //if (menu4.selected == 0)  /*options_menu1(window);*/
+                    if (menu4.selected == 0)  GFX(window);
                     if (menu4.selected == 1)  sound_options(window);
-                    if (menu4.selected == 2)   control_menu(window);
+                    if (menu4.selected == 2)   player_controls(window, moveLeftKey, moveRightKey, moveUpkey, moveDownkey);
                 }
             }
         }
@@ -769,7 +793,6 @@ void  Menu::credits(RenderWindow& window)
         }
         if (Keyboard::isKeyPressed(Keyboard::Escape))
         {
-            pageNumber = 1000;
             pressed = true;
             return;
         }
@@ -796,7 +819,6 @@ void  Menu::instructions(RenderWindow& window)
         }
         if (Keyboard::isKeyPressed(Keyboard::Escape))
         {
-            pageNumber = 1000;
             pressed = true;
             return;
         }
