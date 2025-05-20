@@ -150,6 +150,8 @@ void Gameplay() {
 					//cout << "target is: " << target << endl;
                 }
                 ghosts[i]->update(deltaTime, mp.pos, target);
+                if (!ghosts[i]->isPoisoned)
+                    pacman.walk_speed = 150;
 
             }
         }
@@ -176,7 +178,7 @@ void Gameplay() {
                             ghost->poisoned("Assets/poisoned.png");
                     }
 
-                    pacman.walk_speed += 50;
+                    pacman.walk_speed = 250;
                     cout << "speed : " << pacman.walk_speed;
                 }
                 pacman.nodes[i].setScale(0, 0);
