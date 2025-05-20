@@ -127,7 +127,7 @@ void Gameplay() {
         }
 
         Vector2f pacmanPosition = pacmanSprite.getPosition();
-
+        bool allAreNotPoisened = true;
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
         for (int i = 0; i < 4;i++) {
 
@@ -150,11 +150,15 @@ void Gameplay() {
 					//cout << "target is: " << target << endl;
                 }
                 ghosts[i]->update(deltaTime, mp.pos, target);
-                if (!ghosts[i]->isPoisoned)
-                    pacman.walk_speed = 150;
+                if (ghosts[i]->isPoisoned)
+                    allAreNotPoisened = false;
 
             }
         }
+        if (allAreNotPoisened)
+            pacman.walk_speed = 150;
+        else 
+            pacman.walk_speed = 250;
 
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
@@ -190,7 +194,7 @@ void Gameplay() {
         window.clear();
         window.draw(MapSprite);
 
-        for (int i = 1; i <= 92; i++) {
+        for (int i = 1; i <= 90; i++) {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
             window.draw(pacman.nodes[i]);
             window.draw(nodeNums[i]);
