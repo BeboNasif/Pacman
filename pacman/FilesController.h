@@ -8,5 +8,9 @@ public:
     static void updatePlayerSettings(const string playerName, const map<string, string>& settings);
     static string parsePlayerSettingsToText(const map<string, string> settings,const string playerName);
     static map<string, string> getPlayerSettings(const string playername);
-
+    void Gameover(int curscore,int maxscore);
+    Texture highscoreENDtx, gameovertx;
+    Sprite highscoreENDsp, gameoversp;
+    Font font;
+    Text scoreText1,scoreText2;
 };

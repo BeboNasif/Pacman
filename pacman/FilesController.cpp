@@ -95,3 +95,36 @@ void FilesController::updatePlayerSettings(const string playerName, const map<st
 }
 
 
+void FilesController::Gameover(int curscore,int maxscore) {
+    highscoreENDtx.loadFromFile("Assets/Textures/High_Score.png");
+    highscoreENDsp.setTexture(highscoreENDtx);
+    highscoreENDsp.setPosition(500 , 350);
+    highscoreENDsp.setScale(2.5, 2.5);
+
+    gameovertx.loadFromFile("Assets/Textures/gameover0.png");
+    gameoversp.setTexture(gameovertx);
+    gameoversp.setPosition(500 , 10);
+    gameoversp.setScale(1.8, 1.8),
+
+    font.loadFromFile("Assets/Fonts/BrownieStencil-8O8MJ.ttf");
+    scoreText1.setFont(font);
+    scoreText2.setFont(font);
+
+
+    scoreText1.setString("SCORE:     " + to_string(curscore));
+    scoreText2.setString("MAX SCORE:  " + to_string(maxscore));
+
+    //scoreText3.setString()
+    scoreText1.setPosition(850 , 600);
+    scoreText2.setPosition(850 , 700);
+
+    scoreText1.setCharacterSize(60);
+    scoreText2.setCharacterSize(60);
+
+    scoreText1.setFillColor(Color::White);
+    scoreText2.setFillColor(Color::White);
+
+
+}
+
+
