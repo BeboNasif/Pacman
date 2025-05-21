@@ -10,8 +10,6 @@ public:
     Music bgmusic;
     Sound so, so2, so4, so5, so6, so7, so8, so9, so10, so11, so12, so13;
     void music(int n);
-    //void change_option_Sound();
-    //void select_option_Sound();
 	void startup();
 	void chasing(bool hunting);
 	void eating();

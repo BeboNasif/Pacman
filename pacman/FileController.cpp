@@ -1,9 +1,6 @@
 #include "FilesController.h"
 #include <fstream>
 
-
-
-
 void FilesController::writeFile(const string& filename, const vector<string>& content) {
     ofstream file(filename);
     if (file.is_open()) {

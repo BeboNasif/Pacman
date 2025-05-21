@@ -14,13 +14,22 @@ Sounds sound;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[95];
-
+extern int character;
 bool END = 1;
 extern bool pressed;
 
 void Gameplay(int map_num) {
 	sound.startup();
-
+    sound.bgmusic.pause();
+    Texture lives;
+    lives.loadFromFile("Assets/Textures/pacman/right_" + to_string(1) + (character == 1 ? "m" : "") + ".png");
+    Sprite livesSprite[2];
+    for (int i = 0; i < 2; i++)
+    {
+        livesSprite[i].setTexture(lives);
+        livesSprite[i].setPosition(50 * (i + 1) + i * 50, 900);
+        livesSprite[i].setScale(3, 3);
+    }
     string maxscore = Player::settings["maxScore"];
     int score = 0;
     Sprite pacmanSprite;
@@ -61,14 +70,8 @@ void Gameplay(int map_num) {
     pos = {(float) mp.pos[map_num][map_num?65 : 50].first ,(float)mp.pos[map_num][map_num ? 65 : 50].second };
     Player pacman(pacmanSprite,pos);
    
-    //cerr << "loading" << endl;
     Player::initSettings(map_num);
-   
-   
-    //cerr << "loading done" << endl;/*
-    //cerr << "Player name: " << pacman.playerName << endl;
-    //cerr << "max score: " << pacman.settings["maxScore"] << endl;*/
-
+  
     Font fnt, fnt2;
     fnt.loadFromFile("Assets/Fonts/Freedom-10eM.ttf");
     fnt2.loadFromFile("Assets/Fonts/Carre-JWja.ttf");
@@ -140,7 +143,7 @@ void Gameplay(int map_num) {
         pacman.nodes[it].setOrigin(15, 15);
     }
   
-    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList[map_num]);
+    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList[map_num],map_num);
     Clock clock, clock2;
     srand(time(NULL));
 
@@ -157,12 +160,10 @@ void Gameplay(int map_num) {
                 window.close();
             if (event.key.code == Keyboard::Escape)
             {
-                // save the game state
                 int maxScore = stoi(Player::settings["maxScore"]);
                 if (score > maxScore) {
                     Player::settings["maxScore"] = to_string(score);
                 }
-                //cerr << score << " " << maxScore << endl;
                 sound.so2.stop();
                 pressed = true;
                 GameTexture.create(1920, 1080);
@@ -180,6 +181,8 @@ void Gameplay(int map_num) {
                         ghost->reset(starts[i], mp.pos[map_num]);
                         i++;
                     }
+                    if (menu.play_again)
+                            Gameplay(map_num);
                     return;
                 }
 
@@ -257,7 +260,8 @@ void Gameplay(int map_num) {
         vector<int> skips = ghostNodeBegins[map_num];
         for (int i = 1; i <= (map_num ? 90 : 55); i++) {
             for (auto x : skips)
-                if (i == x) continue;
+                if (i == x) i++;
+
 
             if ( pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
                 if (i == PowerUpNodes[0] or i == PowerUpNodes[1] or i == PowerUpNodes[2] or i == PowerUpNodes[3]) {
@@ -267,7 +271,6 @@ void Gameplay(int map_num) {
                     }
                     sound.chasing(1);
                     pacman.walk_speed = 250;
-                    //cout << "speed : " << pacman.walk_speed;
                 }
                 sound.eating();
                 pacman.nodes[i].setScale(0, 0);
@@ -279,12 +282,13 @@ void Gameplay(int map_num) {
         window.clear();
         window.draw(MapSprite);
         for (int i = 1; i <= (map_num ? 90 : 55); i++) {
-            for (auto x : skips)
-                if (i == x) continue;
+            for (auto x : skips) {
+                
+                if (i == x) i++;
+            }
+            cout << endl;
             window.draw(pacman.nodes[i]);
-            window.draw(nodeNums[i]);
         }
-
 
         for (auto& ghost : ghosts) {
             ghost->draw(window);
@@ -295,6 +299,12 @@ void Gameplay(int map_num) {
 
         window.draw(MaxScore);
         window.draw(MaxScoreVal);
+
+        for (int i = 0; i < pacman.live; i++)
+        {
+			window.draw(livesSprite[i]);
+        }
+
         window.display();
     }
 
@@ -302,7 +312,6 @@ void Gameplay(int map_num) {
     if (score > stoi(pacman.settings["maxScore"])) {
         pacman.settings["maxScore"] = to_string(score);
     }
-    
     // Save settings when gameplay ends
     FilesController::updatePlayerSettings(Player::playerName, Player::settings);
 }

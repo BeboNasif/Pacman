@@ -11,20 +11,18 @@ private:
     float playerdeltatime;
     float player_scale;
     Vector2f velocity;
-   
     int ImageCounter;
     int maximagecounter;
     float AnimationCounter;
-    int live;
-
     State tmp_state;
-
-
     Texture Idle;
     unordered_map<State, vector<Texture>> animationTextures;
+    void resetAfterDeath();
+    void updateAnimationCounter(float speedThreshold, vector<Ghost*>& ghosts, Map& mp, int map_num);
 
 public:
     Sprite& player;
+    int live;
     Vector2f initial_position;
     static string playerName;
     static map<string, string> settings;
@@ -37,7 +35,6 @@ public:
     State curr_state;
     int cur_node;
     int next_node;
-
     bool reachedNode;
     Player(Sprite& p, const Vector2f& startPos);
     void setInitPos(Vector2f pos);
@@ -50,7 +47,4 @@ public:
     void die();
     int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition, int map_num);
 
-private:
-    void resetAfterDeath();
-    void updateAnimationCounter(float speedThreshold, vector<Ghost*>& ghosts,Map &mp,int map_num);
 };

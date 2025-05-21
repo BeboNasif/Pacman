@@ -20,12 +20,12 @@ private:
     float elapsedTime;
     int pathIndex;
     vector<int> path;
-    sf::Texture poisonedTexture;
-    sf::Sprite poisonedSprite;
-    sf::Clock poisonedClock;
+    Texture poisonedTexture;
+    Sprite poisonedSprite;
+    Clock poisonedClock;
     float poisonedDuration = 8.f;
-    sf::Texture deadTexture;
-    sf::Sprite deadSprite;
+    Texture deadTexture;
+    Sprite deadSprite;
     Clock returnClock;
     bool waitingAfterReturn = false;
 
@@ -40,7 +40,7 @@ public:
     void update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode);
     void draw(RenderWindow& window);
     int getCurrentNode();
-    static unordered_map<int, unordered_map<int, vector<int>>> precomputeAllPaths(unordered_map<int, vector<int>> adjList);
+    static unordered_map<int, unordered_map<int, vector<int>>> precomputeAllPaths(unordered_map<int, vector<int>> adjList, int map_num);
     Sprite& getSprite();
     void reset(int startNode, vector<pair<int, int>>& pos);
 

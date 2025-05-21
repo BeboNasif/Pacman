@@ -173,11 +173,10 @@ int Ghost::getCurrentNode() {
     return currentNode;
 }
 
-unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(unordered_map<int, vector<int>> adjList)
+unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(unordered_map<int, vector<int>> adjList, int map_num)
 {
-
+    if (map_num) adjList[91].clear(), adjList[92].clear();
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
-
     for (auto& start_pair : adjList) {
         int start = start_pair.first;
 

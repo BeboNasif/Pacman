@@ -60,6 +60,8 @@ void Player::initSettings(int map_num) {
         settings["moveUpkey"] = "Up";
         settings["moveDownkey"] = "Down";
         settings["maxScore"] = "0";
+        settings["sound"] = "50";
+        settings["music"] = "50";
     }
 }
 
@@ -98,8 +100,10 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
 }
 
 void Player::updateMovement(unordered_map<int, vector<int>> adj, vector<pair<int, int>>& pos, int map_num) {
-    adj[34].clear();
-    adj[34].push_back(33), adj[34].push_back(35);
+    int cleared = 17 * (map_num ? 2 : 1);
+    adj[cleared].clear();
+    adj[cleared].push_back(cleared-1), adj[cleared].push_back(cleared + 1);
+
     Vector2f currentPos = player.getPosition();
     float invert = 1;
     if (curr_state != dead) {
