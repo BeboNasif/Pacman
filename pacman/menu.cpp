@@ -10,6 +10,7 @@ int P_M_Sound = 100;
 int P_M_Music = 100;
 extern Sounds sound;
 int character = 0;
+extern bool END;
 
 bool waitingForKey = false;
 int actionToChange;
@@ -313,8 +314,10 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.MoveUp(menu2.selected, 3);
 
                 if (evt.key.code == Keyboard::Enter) {
+					sound.bgmusic.pause();
                     if (menu2.selected == 0) Gameplay();
                     else if (menu2.selected == 1) Gameplay();
+					sound.bgmusic.play();
                 }
             }
         }
@@ -466,11 +469,11 @@ void Menu::sound_options(RenderWindow& window)
 
     RectangleShape barSound({ P_M_Sound * 3.f, 40.f });
     barSound.setFillColor({ 255, 255, 0 });
-    barSound.setPosition(1005, midY + 1 * menu6.positionOfFace);
+    barSound.setPosition(970, midY + 1 * menu6.positionOfFace);
 
     RectangleShape barMusic({ P_M_Music * 3.f, 40.f });
     barMusic.setFillColor({ 255, 255, 0 });
-    barMusic.setPosition(1005, midY + 2 * menu6.positionOfFace);
+    barMusic.setPosition(970, midY + 2 * menu6.positionOfFace);
 
     menu6.deltaClock.restart();
 
@@ -522,13 +525,16 @@ void Menu::sound_options(RenderWindow& window)
                     barSound.setSize({ P_M_Sound * 3.f, 40.f });
                     sound.so.setVolume(P_M_Sound);
                     sound.so2.setVolume(P_M_Sound);
+                    sound.so4.setVolume(P_M_Sound);
+                    sound.so5.setVolume(P_M_Sound);
+                    sound.so6.setVolume(P_M_Sound);
                 }
                 else if (menu6.selected == 1)
                 {
                     if (Keyboard::isKeyPressed(Keyboard::Left))
-                        P_M_Music = std::max(0, P_M_Music - 10);
+                        P_M_Music = max(0, P_M_Music - 10);
                     if (Keyboard::isKeyPressed(Keyboard::Right))
-                        P_M_Music = std::min(100, P_M_Music + 10);
+                        P_M_Music = min(100, P_M_Music + 10);
 
                     barMusic.setSize({ P_M_Music * 3.f, 40.f });
                     sound.bgmusic.setVolume(P_M_Music);
@@ -820,6 +826,237 @@ void  Menu::instructions(RenderWindow& window)
         }
         window.clear();
         window.draw(instructions);
+        window.display();
+    }
+}
+
+void Menu::Pause(RenderWindow& window, Texture gametexture)
+{
+    Menu Pause1, option;
+    Pause1.choises = END + 3;
+    option.choises = 3;
+    Pause1.mainmenu.resize(Pause1.choises);
+    option.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
+    Pause1.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
+    int x = 200;
+    for (int i = 0; i < Pause1.choises; i++)
+    {
+        if (!i) Pause1.mainmenu[i].setFillColor(Color{ 255,204,0 });
+        else  Pause1.mainmenu[i].setFillColor(Color::White);
+        Pause1.mainmenu[i].setFont(Pause1.font);
+        Pause1.mainmenu[i].setCharacterSize(70);
+        Pause1.mainmenu[i].setPosition(670, x);
+        x += 100;
+    }
+    option.mainmenu.resize(option.choises);
+    x = 200;
+    for (int i = 0; i < option.choises; i++)
+    {
+        if (!i) option.mainmenu[i].setFillColor(Color{ 255,204,0 });
+        else  option.mainmenu[i].setFillColor(Color::White);
+        option.mainmenu[i].setFont(option.font);
+        option.mainmenu[i].setCharacterSize(70);
+        option.mainmenu[i].setPosition(670, x);
+        x += 100;
+    }
+    Pause1.mainmenu[0].setString("resume");
+    Pause1.mainmenu[0 + END].setString("Play Again");
+    Pause1.mainmenu[1 + END].setString("Sound Option");
+    Pause1.mainmenu[2 + END].setString("Exit");
+
+    option.mainmenu[0].setString("Sound - \t\t\t   +");
+    option.mainmenu[1].setString("Music  - \t\t\t   +");
+    option.mainmenu[2].setString("Back");
+
+
+    RectangleShape photo2;
+    photo2.setSize(Vector2f(1920, 1080));
+    photo2.setFillColor(Color(0, 0, 0, 100));
+
+    Sprite game;
+    game.setTexture(gametexture);
+
+    Texture txx;
+    txx.loadFromFile("Assets/Textures/Pausemenu.png");
+
+    Sprite pausemenu;
+    pausemenu.setTexture(txx);
+    pausemenu.setPosition(600, 150);
+    pausemenu.setScale(1.7, 2.2);
+    Pause1.Face_intilization();
+    Pause1.Face.setPosition(630, 220);
+    Pause1.positionOfFace = 100;
+
+
+    option.Face_intilization();
+    option.Face.setPosition(630, 220);
+    option.positionOfFace = 100;
+
+    RectangleShape Sound(Vector2f(P_M_Sound * 3, 40));
+    Sound.setFillColor({ 255, 255, 0 });
+    Sound.setPosition(885, 220);
+
+    RectangleShape Music(Vector2f(P_M_Music * 3, 40));
+    Music.setFillColor({ 255, 255, 0 });
+    Music.setPosition(885, 320);
+
+    bool op = false;
+    while (window.isOpen()) {
+        Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if (event.type == sf::Event::KeyReleased) {
+                if (!op) {
+                    if (event.key.code == sf::Keyboard::Up) {
+                        Pause1.MoveUp(Pause1.selected, Pause1.choises);
+                    }
+                    if (event.key.code == sf::Keyboard::Down) {
+                        Pause1.MoveDown(Pause1.selected, Pause1.choises);
+                    }
+                    if (event.key.code == Keyboard::Escape && !pressed && Pause1.selected != 2 + END)
+                    {
+                        Pause1.mainmenu[Pause1.selected].setFillColor(Color::White);
+                        Pause1.selected = 2 + END;
+                        Pause1.mainmenu[2 + END].setFillColor(Color{ 255,204,0 });
+                        Pause1.Face.setPosition(630, END ? 520 : 420);
+                        pressed = true;
+                    }
+                    if (event.key.code == Keyboard::Enter || (event.key.code == Keyboard::Escape && !pressed)) {
+                        if (Pause1.selected == -1 + END) {
+                            return;
+                        }
+                        if (Pause1.selected == 0 + END) {
+                            play_again = 1;
+                            exit = 1;
+                            return;
+                        }
+                        if (Pause1.selected == 1 + END) {
+                            op = true;
+                        }
+                        if (Pause1.selected == 2 + END) {
+                            window.setView(window.getDefaultView());
+                            play_again = 0;
+                            exit = 1;
+                            return;
+                        }
+                    }
+
+                    if (!Keyboard::isKeyPressed(Keyboard::Escape))
+                    {
+                        pressed = false;
+                    }
+                }
+                else if (op)
+                {
+                    if (event.key.code == sf::Keyboard::Up) {
+                        option.MoveUp(option.selected, option.choises);
+                        //break;
+                    }
+                    if (event.key.code == sf::Keyboard::Down) {
+                        option.MoveDown(option.selected, option.choises);
+                        //break;
+                    }
+                    if (event.key.code == Keyboard::Escape && !pressed && option.selected != 2)
+                    {
+                        option.mainmenu[option.selected].setFillColor(Color::White);
+                        option.selected = 2;
+                        option.mainmenu[2].setFillColor(Color{ 255,204,0 });
+                        option.Face.setPosition(630, 420);
+                        pressed = true;
+                    }
+                    if (event.key.code == Keyboard::Enter || (event.key.code == Keyboard::Escape && !pressed))
+                    {
+                        if (option.selected == 2) {
+                            pressed = true;
+                            op = false;
+                        }
+                    }
+                    if (option.selected == 0)
+                    {
+                        if (event.key.code == sf::Keyboard::Left)
+                        {
+                            if (P_M_Sound > 0)
+                                P_M_Sound -= 10;
+                            else
+                                P_M_Sound = 0;
+                        }
+                        if (event.key.code == sf::Keyboard::Right)
+                        {
+                            if (P_M_Sound < 100)
+                                P_M_Sound += 10;
+                            else
+                                P_M_Sound = 100;
+                        }
+                        Sound.setSize(Vector2f(P_M_Sound * 3, 40));
+                        sound.so.setVolume(P_M_Sound);
+                        sound.so2.setVolume(P_M_Sound);
+                        sound.so4.setVolume(P_M_Sound);
+                        sound.so5.setVolume(P_M_Sound);
+                        sound.so6.setVolume(P_M_Sound);
+                        sound.so7.setVolume(P_M_Sound);
+                        sound.so8.setVolume(P_M_Sound);
+                        sound.so9.setVolume(P_M_Sound);
+                        sound.so10.setVolume(P_M_Sound);
+                        sound.so11.setVolume(P_M_Sound);
+                        sound.so12.setVolume(P_M_Sound);
+                        sound.so13.setVolume(P_M_Sound);
+                    }
+                    else if (option.selected == 1)
+                    {
+                        if (event.key.code == Keyboard::Left)
+                        {
+                            if (P_M_Music > 0)
+                                P_M_Music -= 10;
+                            else
+                                P_M_Music = 0;
+                        }
+                        if (event.key.code == Keyboard::Right)
+                        {
+                            if (P_M_Music < 100)
+                                P_M_Music += 10;
+                            else
+                                P_M_Music = 100;
+                        }
+                    }
+                    Music.setSize(Vector2f(P_M_Music * 3, 40));
+                    sound.bgmusic.setVolume(P_M_Music);
+
+
+                    if (!Keyboard::isKeyPressed(Keyboard::Escape))
+                    {
+                        pressed = false;
+                    }
+                }
+
+            }
+        }
+
+        float dt = Pause1.deltaClock.restart().asSeconds();
+        Pause1.updateFaces(dt);
+
+        float dt1 = option.deltaClock.restart().asSeconds();
+        option.updateFaces(dt1);
+
+        window.clear();
+        window.draw(game);
+        window.draw(photo2);
+        window.draw(pausemenu);
+        if (!op) {
+            for (int i = 0; i < Pause1.choises; i++) {
+                window.draw(Pause1.mainmenu[i]);
+            }
+            window.draw(Pause1.Face);
+        }
+        else
+        {
+            for (int i = 0; i < option.choises; i++) {
+                window.draw(option.mainmenu[i]);
+            }
+            window.draw(option.Face);
+            window.draw(Sound);
+            window.draw(Music);
+        }
         window.display();
     }
 }

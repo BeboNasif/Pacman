@@ -14,6 +14,8 @@ public:
     void options_menu(RenderWindow& window);
 	void credits(RenderWindow& window);
 	void instructions(RenderWindow& window);
+	void Pause(RenderWindow& window, Texture gametexture);
+    bool exit = 0;
 
 private:
     void updateFaces(float dt);
@@ -50,4 +52,6 @@ private:
     // ——— Timing & layout ———
     Clock deltaClock;
     float positionOfFace;
+
+    bool play_again = 0;
 };

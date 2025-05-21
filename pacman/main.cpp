@@ -13,14 +13,19 @@ RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[95];
 float timer = 0;
+bool END = 1;
+extern bool pressed;
 
 void Gameplay() {
+	sound.startup();
     int score = 0;
     Sprite pacmanSprite;
     pacmanSprite.setOrigin(11, 11);
     pacmanSprite.setScale(0.6, 0.6);
     Sprite MapSprite;
     Texture mapText;
+    Texture GameTexture;
+
     mapText.loadFromFile("Assets/FullMap.png");
     MapSprite.setTexture(mapText);
     MapSprite.setScale(1.65f, 1.65f);
@@ -103,13 +108,39 @@ void Gameplay() {
 
     while (window.isOpen()) {
         float deltaTime = clock.restart().asSeconds();
-
+        if (sound.so.getStatus() != Sound::Playing)
+        {
+            if(sound.so2.getStatus() != Sound::Playing && sound.so6.getStatus() != Sound::Playing)
+				sound.chasing(0);
+        }
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
             if (event.key.code == Keyboard::Escape)
-                return;
+            {
+                sound.so2.stop();
+                pressed = true;
+                GameTexture.create(1920, 1080);
+                GameTexture.update(window);
+                menu.Pause(window, GameTexture);
+
+                if (menu.exit)
+                {
+                    menu.exit = 0;
+                    sound.music(0);
+                    //reset();
+                    return;
+                }
+
+                if (menu.exit)
+                {
+                    menu.exit = 0;
+                    sound.music(0);
+                    //reset();
+                    return;
+                }
+            }
         }
 
         if (clock2.getElapsedTime().asSeconds() >= 1 && pacman.curr_state != 0) {
@@ -152,7 +183,6 @@ void Gameplay() {
                 ghosts[i]->update(deltaTime, mp.pos, target);
                 if (ghosts[i]->isPoisoned)
                     allAreNotPoisened = false;
-
             }
         }
         if (allAreNotPoisened)
@@ -163,9 +193,12 @@ void Gameplay() {
         for (auto& ghost : ghosts) {
             if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 if (ghost->isPoisoned) {
+					sound.eat_ghost();
                     if(!ghost->isDead) ghost->die("Assets/DEAD2.png",score);
                 }
                 else {
+					sound.so2.stop();
+				    sound.dying();
                     pacman.die();
                     timer = 0;
                 }
@@ -181,10 +214,11 @@ void Gameplay() {
                         if (ghost->ghostOut == 1)
                             ghost->poisoned("Assets/poisoned.png");
                     }
-
+                    sound.chasing(1);
                     pacman.walk_speed = 250;
                     cout << "speed : " << pacman.walk_speed;
                 }
+                sound.eating();
                 pacman.nodes[i].setScale(0, 0);
                 score += 20;
             }
