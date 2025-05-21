@@ -202,13 +202,6 @@ void Player::updatePlace(Vector2f window) {
         player.setPosition(1475, player.getPosition().y);
     }
 
-    if (player.getPosition().y > window.y) {
-        player.setPosition(player.getPosition().x, 0);
-    }
-    else if (player.getPosition().y < 0) {
-        player.setPosition(player.getPosition().x, window.y);
-    }
-
 
 }
 void Player::updateAnimation(vector<Ghost*>& ghosts,Map &mp,int map_num ) {

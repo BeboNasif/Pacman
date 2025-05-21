@@ -11,14 +11,14 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Fullscreen);
+RenderWindow window(VideoMode(1920, 1080), "Pacman");
 
 Text nodeNums[95];
 extern int character;
 bool END = 1;
 extern bool pressed;
 FilesController filesController;
-
+int winScore;
 void Gameplay(int map_num) {
 	sound.startup();
     sound.bgmusic.pause();
@@ -40,10 +40,14 @@ void Gameplay(int map_num) {
     Texture mapText;
     Texture GameTexture;
 
-    if (map_num == 1)
+    if (map_num == 1) {
         mapText.loadFromFile("Assets/FullMap.png");
-    else 
+        winScore = 86;
+    }
+    else {
         mapText.loadFromFile("Assets/MapNormal.png");
+        winScore = 51;
+    }
     MapSprite.setTexture(mapText);
     MapSprite.setScale(1.65f * (map_num ? 1 : 2), 1.65f * (map_num ? 1: 2 ));
     MapSprite.setOrigin(mapText.getSize().x / 2.f, mapText.getSize().y / 2.f);
@@ -251,7 +255,7 @@ void Gameplay(int map_num) {
                 else {
 					sound.so2.stop();
 				    sound.dying();
-                    pacman.die();
+                   // pacman.die();
                     int prevMaxScore = stoi(pacman.settings["maxScore"]);
                     if (score > prevMaxScore) {
                         pacman.settings["maxScore"] = to_string(score);
@@ -277,9 +281,12 @@ void Gameplay(int map_num) {
                     sound.chasing(1);
                     pacman.walk_speed = 250;
                 }
+
                 sound.eating();
                 pacman.nodes[i].setScale(0, 0);
                 score += 20;
+                winScore--;
+                
             }
         }
         Score.setString("Score");
