@@ -202,8 +202,8 @@ unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(un
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
 
 	// level one with BFS Search
-    if (map_num == 0)
-    {
+    //if (map_num == 0)
+    //{
         for (auto& start_pair : adjList)
         {
             int start = start_pair.first;
@@ -242,15 +242,15 @@ unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(un
             }
         }
 
-    }
+    //}
 
 
 	// level two with A* Search
-	else if (map_num == 1)
-	{
+	//else if (map_num == 1)
+	//{
         // ad el denya ya saad
-       
-	}
+
+	//}
     
     return allPaths;
 }
