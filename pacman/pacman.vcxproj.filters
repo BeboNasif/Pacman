@@ -39,7 +39,7 @@
     <ClCompile Include="KeyboardKEYS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileController.cpp">
+    <ClCompile Include="FilesController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClInclude Include="Ghost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileController.h">
+    <ClInclude Include="FilesController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
