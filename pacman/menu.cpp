@@ -467,7 +467,6 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.MoveUp(menu2.selected, 3);
 
                 if (evt.key.code == Keyboard::Enter) {
-                    sound.bgmusic.pause();
                     if (menu2.selected == 0) Gameplay();
                     else if (menu2.selected == 1) Gameplay();
                     if (!play_again)

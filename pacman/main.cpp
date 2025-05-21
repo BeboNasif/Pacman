@@ -19,6 +19,7 @@ bool END = 1;
 extern bool pressed;
 
 void Gameplay() {
+	sound.bgmusic.pause();
     Texture lives;
     lives.loadFromFile("Assets/Textures/pacman/right_" + to_string(1) + (character == 1 ? "m" : "") + ".png");
 	Sprite livesSprite[2];
@@ -171,6 +172,8 @@ void Gameplay() {
                         ghost->reset(starts[i], mp.pos);
                         i++;
                     }
+                    if (menu.play_again)
+                            Gameplay();
                     return;
                 }
 
