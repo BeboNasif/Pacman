@@ -96,10 +96,10 @@ void FilesController::updatePlayerSettings(const string playerName, const map<st
 
 
 void FilesController::Gameover(int curscore,int maxscore) {
-    highscoreENDtx.loadFromFile("Assets/Textures/High_Score.png");
+    highscoreENDtx.loadFromFile("Assets/Textures/highscore.png");
     highscoreENDsp.setTexture(highscoreENDtx);
-    highscoreENDsp.setPosition(500 , 350);
-    highscoreENDsp.setScale(2.5, 2.5);
+    highscoreENDsp.setPosition(500 , 5);
+    highscoreENDsp.setScale(1.7, 1.7);
 
     gameovertx.loadFromFile("Assets/Textures/gameover0.png");
     gameoversp.setTexture(gameovertx);

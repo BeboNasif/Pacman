@@ -168,6 +168,8 @@ void Gameplay(int map_num) {
                 }
                 sound.so2.stop();
                 pressed = true;
+                if (pacman.gameOver)
+                    END = 0;
                 GameTexture.create(1920, 1080);
                 GameTexture.update(window);
                 menu.Pause(window, GameTexture);
