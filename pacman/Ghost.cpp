@@ -7,6 +7,7 @@
 #include "Ghost.h"
 #include "Sounds.h"
 #include "Player.h"
+
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
 float Ghost::timer = 0;
 
@@ -200,43 +201,57 @@ unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(un
 
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
 
-    for (auto& start_pair : adjList) {
-        int start = start_pair.first;
+	// level one with BFS Search
+    if (map_num == 0)
+    {
+        for (auto& start_pair : adjList)
+        {
+            int start = start_pair.first;
 
-        queue<int> q;
-        unordered_map<int, int> parent;
-        unordered_set<int> visited;
+            queue<int> q;
+            unordered_map<int, int> parent;
+            unordered_set<int> visited;
 
-        q.push(start);
-        visited.insert(start);
-        parent[start] = -1;
+            q.push(start);
+            visited.insert(start);
+            parent[start] = -1;
 
-        while (!q.empty()) {
-            int current = q.front();
-            q.pop();
+            while (!q.empty()) {
+                int current = q.front();
+                q.pop();
 
-            for (int neighbor : adjList[current]) {
-                if (!visited.count(neighbor)) {
-                    visited.insert(neighbor);
-                    parent[neighbor] = current;
-                    q.push(neighbor);
+                for (int neighbor : adjList[current]) {
+                    if (!visited.count(neighbor)) {
+                        visited.insert(neighbor);
+                        parent[neighbor] = current;
+                        q.push(neighbor);
+                    }
                 }
             }
+
+            for (auto& end_pair : parent) {
+                int end = end_pair.first;
+                vector<int> path;
+                int cur = end;
+                while (cur != -1) {
+                    path.push_back(cur);
+                    cur = parent[cur];
+                }
+                reverse(path.begin(), path.end());
+                allPaths[start][end] = path;
+            }
         }
 
-        for (auto& end_pair : parent) {
-            int end = end_pair.first;
-            vector<int> path;
-            int cur = end;
-            while (cur != -1) {
-                path.push_back(cur);
-                cur = parent[cur];
-            }
-            reverse(path.begin(), path.end());
-            allPaths[start][end] = path;
-        }
     }
 
+
+	// level two with A* Search
+	else if (map_num == 1)
+	{
+        // ad el denya ya saad
+       
+	}
+    
     return allPaths;
 }
 
