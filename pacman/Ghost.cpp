@@ -114,7 +114,7 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
         sprite.setPosition(targetPos);
         currentNode = path[pathIndex + 1];
         pathIndex++;
-        if (isDead and (currentNode == pacmanNode)) 
+        if (isDead and (currentNode == pacmanNode)) //base
         {
             ghostOut = 0;
             isDead = false;
@@ -271,11 +271,16 @@ void Ghost::reset(int startNode, vector<pair<int, int>>& pos) {
 
 // up : 0, down : 1, right : 2, left : 3
 
-int dfs(int node, int start, int limit, int steps, unordered_map<int, std::vector<int>>& adjList) {
+int dfs(int node,int par, int limit, int steps, unordered_map<int, vector<int>>& adjList,vector <int> &takenNodes) {
     if (steps == limit) return node;
     for (auto child : adjList[node]) {
-        if (child == start) continue;
-        return dfs(child, start, limit, steps + 1, adjList);
+        bool skip=0;
+        for (auto taken : takenNodes) {
+            if (child == taken) skip = 1;
+        }
+        if (skip) continue;
+        takenNodes.push_back(child);
+        return dfs(child,node, limit, steps + 1, adjList,takenNodes);
     }
     return 0;
 }
@@ -333,22 +338,31 @@ int Ghost::Clyde(int pacmanNode,int map_num) {
 
 
 // pinky --> 3 steps ahead of pacman
-int Ghost::Pinky(int pacmanNode, int dir, unordered_map<int, std::vector<int>>& adjList) {
+int Ghost::Pinky(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjList,int BlinkyNode) {
+    
+    if (allPaths[pacmanNode][BlinkyNode].size() > allPaths[pacmanNode][currentNode].size()) {
+        return pacmanNode;
+    }
     // node -> the node pacman is directed to 
     int node = getNext(pacmanNode, dir);
     int limit = 3;
-    return dfs(node, pacmanNode, limit, 0, adjList);
+    vector <int> takenNodes = { pacmanNode };
+    return dfs(node, pacmanNode, limit, 0, adjList,takenNodes);
 
 }
 
 
 // inky --> 2 steps ahead of pacman + blinky distance
-int Ghost::Inky(int pacmanNode, int dir, int Ad3kNode, unordered_map<int, std::vector<int>>& adjList)
+int Ghost::Inky(int pacmanNode, int dir, int Ad3kNode, unordered_map<int, vector<int>>& adjList)
 {
+    if (allPaths[pacmanNode][currentNode].size() <= 2) {
+        return pacmanNode;
+    }
     int node = getNext(pacmanNode, dir);
     int dist = allPaths[Ad3kNode][pacmanNode].size();
     int limit = dist + 2;
-    return dfs(node, pacmanNode, limit, 0, adjList);
+    vector <int> takenNodes = { pacmanNode };
+    return dfs(node, pacmanNode, limit, 0, adjList,takenNodes);
 
 }
 
