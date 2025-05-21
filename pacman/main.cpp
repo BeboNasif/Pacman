@@ -11,12 +11,13 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
+RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Fullscreen);
 
 Text nodeNums[95];
 extern int character;
 bool END = 1;
 extern bool pressed;
+FilesController filesController;
 
 void Gameplay(int map_num) {
 	sound.startup();
@@ -156,12 +157,12 @@ void Gameplay(int map_num) {
 				sound.chasing(0);
         }
         Event event;
+        int maxScore = stoi(Player::settings["maxScore"]);
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
             if (event.key.code == Keyboard::Escape)
             {
-                int maxScore = stoi(Player::settings["maxScore"]);
                 if (score > maxScore) {
                     Player::settings["maxScore"] = to_string(score);
                 }
@@ -203,8 +204,9 @@ void Gameplay(int map_num) {
             pacman.updateAnimation(ghosts, mp, map_num);
             if(map_num)
                 pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
-        }
 
+
+        }
         Vector2f pacmanPosition = pacmanSprite.getPosition();
         bool allAreNotPoisened = true;
         int pacmanNode = pacman.getCurrentNode(mp.pos[map_num], pacmanPosition, map_num);
@@ -304,6 +306,16 @@ void Gameplay(int map_num) {
         for (int i = 0; i < pacman.live; i++)
         {
 			window.draw(livesSprite[i]);
+        }
+        if (pacman.gameOver)
+        {
+            filesController.Gameover(score, maxScore);
+			if (score >= maxScore)
+                window.draw(filesController.highscoreENDsp);
+            else
+                window.draw(filesController.gameoversp);
+            window.draw(filesController.scoreText1);
+            window.draw(filesController.scoreText2);
         }
 
         window.display();
