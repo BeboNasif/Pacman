@@ -16,7 +16,6 @@ private:
     Texture texture;
     Sprite sprite;
     float speed;
-    int currentNode;
     float elapsedTime;
     int pathIndex;
     vector<int> path;
@@ -30,6 +29,7 @@ private:
     bool waitingAfterReturn = false;
 
 public:
+    int currentNode;
     static float timer;
     bool isDead = 0;
     bool isPoisoned = false;
@@ -44,7 +44,7 @@ public:
     Sprite& getSprite();
     void reset(int startNode, vector<pair<int, int>>& pos);
 
-    int Pinky(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjList); // pacmannode + 3
+    int Pinky(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjList,int BlinkyNode); // pacmannode + 3
     int Inky(int pacmanNode, int dir, int Ad3kdist, unordered_map<int, vector<int>>& adjList); // pacmannode + Blinky distance 
     int Clyde(int pacmanNode,int map_num); //afraid one (runs to corners when near pacman) 
     int Blinky(int pacmanNode); // red (  Blinky >:)  )
