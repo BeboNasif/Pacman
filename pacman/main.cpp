@@ -14,7 +14,7 @@ Sounds sound;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[95];
-float timer = 0;
+
 bool END = 1;
 extern bool pressed;
 
@@ -155,22 +155,21 @@ void Gameplay() {
                 {
                     menu.exit = 0;
                     sound.music(0);
-                    //reset();
+                    int i = 0;
+                    vector<int> starts = { 34,40,41,42 };
+                    for (auto& ghost : ghosts) {
+                        ghost->reset(starts[i], mp.pos);
+                        i++;
+                    }
                     return;
                 }
 
-                if (menu.exit)
-                {
-                    menu.exit = 0;
-                    sound.music(0);
-                    //reset();
-                    return;
-                }
+ 
             }
         }
 
         if (clock2.getElapsedTime().asSeconds() >= 1 && pacman.curr_state != 0) {
-            timer++;
+            Ghost::timer++;
             clock2.restart();
         }
 
@@ -188,7 +187,7 @@ void Gameplay() {
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
         for (int i = 0; i < 4;i++) {
 
-            if ((!pacman.gameOver && !pacman.isDead && pacman.curr_state) && ghosts[i]->shouldUpdate(i, timer)) {
+            if ((!pacman.gameOver && !pacman.isDead && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
                 if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList);
@@ -231,7 +230,7 @@ void Gameplay() {
                         pacman.settings["maxScore"] = to_string(score);
                     }
                     FilesController::updatePlayerSettings(Player::playerName, Player::settings);
-                    timer = 0;
+                    Ghost::timer = 0;
                 }
             }
         }
@@ -288,14 +287,14 @@ void Gameplay() {
 }
 
 int main() {
-    cout << "zebbi" << endl;
+   
     window.setFramerateLimit(120);
     // Show player name input menu first if it's the first time
     if (menu.show_name_input) {
         menu.player_name_input(window);
     }
     // Ensure settings file exists
-    cout << "zebbi2" << endl;
+   
     try {
         ifstream settingsFile("Settings.txt");
         if (!settingsFile) {
@@ -306,7 +305,7 @@ int main() {
         ofstream createSettings("Settings.txt");
         createSettings.close();
     }
-    cout << "zebbi3" << endl;
+   
     menu.menu1(window);
     
     

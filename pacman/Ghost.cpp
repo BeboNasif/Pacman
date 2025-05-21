@@ -8,9 +8,9 @@
 #include "Sounds.h"
 #include "Player.h"
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
-
+float Ghost::timer = 0;
 Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> adjList, vector<pair<int, int>> pos) {
-
+    timer = 0;
     texture.loadFromFile(texturePath);
     sprite.setTexture(texture);
     sprite.setOrigin(8, 8);
@@ -231,6 +231,7 @@ void Ghost::reset(int startNode, vector<pair<int, int>>& pos) {
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
     ghostOut = 0;
     isDead = 0;
+    timer = 0;
 }
 
 int Ghost::Amoor(int pacmanNode) {
@@ -315,7 +316,7 @@ void Ghost::poisoned(const string& poisonedTexturePath) {
     poisonedClock.restart();
 }
 
-bool Ghost::shouldUpdate(int i, float timer) {
+bool Ghost::shouldUpdate(int i) {
     return (isPoisoned || ghostOut || (i == 0) || (i == 1 && timer > 5) || (i == 2 && timer > 10) || (i == 3 && timer > 15));
 }
 

@@ -30,10 +30,11 @@ private:
     bool waitingAfterReturn = false;
 
 public:
+    static float timer;
     bool isDead = 0;
     bool isPoisoned = false;
     bool ghostOut = 0;
-    bool shouldUpdate(int i,float timer);
+    bool shouldUpdate(int i);
     static unordered_map<int, unordered_map<int, vector<int>>> allPaths;
     Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> adjList, vector<pair<int, int>> pos);
     void update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode);
