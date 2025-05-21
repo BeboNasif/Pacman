@@ -17,7 +17,7 @@ extern bool END;
 
 bool waitingForKey = false;
 int actionToChange;
-void Gameplay();
+void Gameplay(int map_num);
 
 Menu::Menu()
     : choises(0)
@@ -95,7 +95,7 @@ void Menu::player_name_input(RenderWindow& window)
                     // Set the player name in the Player class
                     Player::playerName = playerName;
                     // sound.playMenuSelect();
-                    Player::initSettings();
+                    Player::initSettings(1);
                     return;
                 }
                 else if (event.key.code == Keyboard::BackSpace && !playerName.empty())
@@ -436,8 +436,8 @@ void Menu::Play_menu(RenderWindow& window)
 
                 if (evt.key.code == Keyboard::Enter) {
 					sound.bgmusic.pause();
-                    if (menu2.selected == 0) Gameplay();
-                    else if (menu2.selected == 1) Gameplay();
+                    if (menu2.selected == 0) Gameplay(0); // normal
+                    else if (menu2.selected == 1) Gameplay(1); // hard
 					sound.bgmusic.play();
                 }
             }

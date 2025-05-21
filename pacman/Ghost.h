@@ -46,7 +46,7 @@ public:
 
     int EL7okooma(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjList); //pacmannode + 3
     int ELSaad(int pacmanNode, int dir, int Ad3kdist, unordered_map<int, vector<int>>& adjList); // pacmannode + ad3ak distance 
-    int Amoor(int pacmanNode); //afraid one (runs to corners when near pacman) 
+    int Amoor(int pacmanNode,int map_num); //afraid one (runs to corners when near pacman) 
     int Ad3k(int pacmanNode); // red (  ad3k >:)  )
     void poisoned(const string& poisonedTexturePath);
     void die(const string& deadTexturePath, int& score);

@@ -18,8 +18,9 @@ Text nodeNums[95];
 bool END = 1;
 extern bool pressed;
 
-void Gameplay() {
+void Gameplay(int map_num) {
 	sound.startup();
+
     string maxscore = Player::settings["maxScore"];
     int score = 0;
     Sprite pacmanSprite;
@@ -29,9 +30,12 @@ void Gameplay() {
     Texture mapText;
     Texture GameTexture;
 
-    mapText.loadFromFile("Assets/FullMap.png");
+    if (map_num == 1)
+        mapText.loadFromFile("Assets/FullMap.png");
+    else 
+        mapText.loadFromFile("Assets/MapNormal.png");
     MapSprite.setTexture(mapText);
-    MapSprite.setScale(1.65f, 1.65f);
+    MapSprite.setScale(1.65f * (map_num ? 1 : 2), 1.65f * (map_num ? 1: 2 ));
     MapSprite.setOrigin(mapText.getSize().x / 2.f, mapText.getSize().y / 2.f);
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
     Text Score;
@@ -39,25 +43,31 @@ void Gameplay() {
     Text ScoreVal;
     Text MaxScoreVal;
     mp.init();
-    //mp.printAdjList();
+    mp.printAdjList(map_num);
 
-    Ghost redGhost(34, "Assets/red.png", mp.adjList, mp.pos);
-    Ghost pinkGhost(40, "Assets/pink.png", mp.adjList, mp.pos);
-    Ghost blueGhost(41, "Assets/cyan.png", mp.adjList, mp.pos);
-    Ghost yellowGhost(42, "Assets/yellow.png", mp.adjList, mp.pos);
-    sf::Texture poisonedTexture;
+    vector<int> ghostNodeBegins[2] = { {17,27,28,29},{34,40,41,42} };
+    int idx = 0;
+    Ghost redGhost(ghostNodeBegins[map_num][idx++], "Assets/red.png", mp.adjList[map_num], mp.pos[map_num]);
+    Ghost pinkGhost(ghostNodeBegins[map_num][idx++], "Assets/pink.png", mp.adjList[map_num], mp.pos[map_num]);
+    Ghost blueGhost(ghostNodeBegins[map_num][idx++], "Assets/cyan.png", mp.adjList[map_num], mp.pos[map_num]);
+    Ghost yellowGhost(ghostNodeBegins[map_num][idx++], "Assets/yellow.png", mp.adjList[map_num], mp.pos[map_num]);
+    Texture poisonedTexture;
     poisonedTexture.loadFromFile("Assets/poisoned.png");
 
 
     vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 
-    Player pacman(pacmanSprite);
-    
-    cerr << "loading" << endl;
-    Player::initSettings();
-    cerr << "loading done" << endl;
-    cerr << "Player name: " << pacman.playerName << endl;
-    cerr << "max score: " << pacman.settings["maxScore"] << endl;
+    Vector2f pos = {0,0};
+    pos = {(float) mp.pos[map_num][map_num?65 : 50].first ,(float)mp.pos[map_num][map_num ? 65 : 50].second };
+    Player pacman(pacmanSprite,pos);
+   
+    //cerr << "loading" << endl;
+    Player::initSettings(map_num);
+   
+   
+    //cerr << "loading done" << endl;/*
+    //cerr << "Player name: " << pacman.playerName << endl;
+    //cerr << "max score: " << pacman.settings["maxScore"] << endl;*/
 
     Font fnt, fnt2;
     fnt.loadFromFile("Assets/Fonts/Freedom-10eM.ttf");
@@ -79,19 +89,12 @@ void Gameplay() {
     MaxScoreVal.setPosition(200, 150);
     MaxScore.setString("Max Score ");
     MaxScoreVal.setString(" " + maxscore);
-
-    for (int i = 1; i <= 92; i++) {
+    for (int i = 1; i <= (map_num?92:55); i++) {
+        
         CircleShape c(3);
         c.setFillColor(Color::Yellow);
-        auto cur = mp.pos[i];
+        auto cur = mp.pos[map_num][i];
         Vector2f v(cur.first, cur.second);
-        /*Text node;
-        node.setFont(fnt2);
-        node.setPosition(v);
-        node.setString(to_string(i));
-        node.setCharacterSize(30);
-        node.setFillColor(Color::Blue);
-        nodeNums[i] = node;*/
         c.setPosition(v);
         pacman.nodes[i] = c;
     }
@@ -100,29 +103,44 @@ void Gameplay() {
 
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> dis1(0, 14), dis2(0, 19);
+    uniform_int_distribution<> dis1(0, 14), dis2(0, 19), dis3(0,5);
 
     vector<int> upperleft, upperright, lowerleft, lowerright;
-    for (int i = 0; i <= 2; i++)
-        for (int j = 1; j <= 5; j++)
-            upperleft.push_back(10 * i + j), upperright.push_back(10 * i + j + 5);
+    if (map_num) {
+        for (int i = 0; i <= 2; i++)
+            for (int j = 1; j <= 5; j++)
+                upperleft.push_back(10 * i + j), upperright.push_back(10 * i + j + 5);
 
-    for (int i = 5; i <= 8; i++)
-        for (int j = 1; j <= 5; j++)
-            lowerleft.push_back(10 * i + j), lowerright.push_back(10 * i + j + 5);
+        for (int i = 5; i <= 8; i++)
+            for (int j = 1; j <= 5; j++)
+                lowerleft.push_back(10 * i + j), lowerright.push_back(10 * i + j + 5);
 
-    PowerUpNodes[0] = upperleft[dis1(gen)];
-    PowerUpNodes[1] = upperright[dis1(gen)];
-    PowerUpNodes[2] = lowerright[dis2(gen)];
-    PowerUpNodes[3] = lowerleft[dis2(gen)];
+        PowerUpNodes[0] = upperleft[dis1(gen)];
+        PowerUpNodes[1] = upperright[dis1(gen)];
+        PowerUpNodes[2] = lowerright[dis2(gen)];
+        PowerUpNodes[3] = lowerleft[dis2(gen)];
+    }
+    else {
+        upperleft = { 1,2,3,12,13,14 };
+        upperright = { 9,10,11,20,21,22 };
 
+        lowerleft = { 34,35,36,45,46,47 };
+        lowerright = { 41,42,43,55,53,54 };
+        PowerUpNodes[0] = upperleft[dis3(gen)];
+        PowerUpNodes[1] = upperright[dis3(gen)];
+        PowerUpNodes[2] = lowerright[dis3(gen)];
+        PowerUpNodes[3] = lowerleft[dis3(gen)];
+
+    }
+
+   
     for (auto it : PowerUpNodes) {
         pacman.nodes[it].setRadius(15);
         pacman.nodes[it].setFillColor({ 255,165,0 });
         pacman.nodes[it].setOrigin(15, 15);
     }
-
-    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList);
+  
+    Ghost::allPaths = Ghost::precomputeAllPaths(mp.adjList[map_num]);
     Clock clock, clock2;
     srand(time(NULL));
 
@@ -144,7 +162,7 @@ void Gameplay() {
                 if (score > maxScore) {
                     Player::settings["maxScore"] = to_string(score);
                 }
-                cerr << score << " " << maxScore << endl;
+                //cerr << score << " " << maxScore << endl;
                 sound.so2.stop();
                 pressed = true;
                 GameTexture.create(1920, 1080);
@@ -156,9 +174,10 @@ void Gameplay() {
                     menu.exit = 0;
                     sound.music(0);
                     int i = 0;
-                    vector<int> starts = { 34,40,41,42 };
+                    vector<int> starts = ghostNodeBegins[map_num];
                     for (auto& ghost : ghosts) {
-                        ghost->reset(starts[i], mp.pos);
+                        
+                        ghost->reset(starts[i], mp.pos[map_num]);
                         i++;
                     }
                     return;
@@ -173,39 +192,39 @@ void Gameplay() {
             clock2.restart();
         }
 
-
         if (!pacman.gameOver) {
             pacman.setDeltaTime(deltaTime);
-            pacman.handleInput(mp.adjList, mp.pos);
-            pacman.updateMovement(mp.adjList, mp.pos);
-            pacman.updateAnimation(ghosts, mp);
-            pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
+            pacman.handleInput(mp.adjList[map_num], mp.pos[map_num],map_num);
+            pacman.updateMovement(mp.adjList[map_num], mp.pos[map_num],map_num);
+            pacman.updateAnimation(ghosts, mp, map_num);
+            if(map_num)
+                pacman.updatePlace(Vector2f(window.getSize().x, window.getSize().y));
         }
 
         Vector2f pacmanPosition = pacmanSprite.getPosition();
         bool allAreNotPoisened = true;
-        int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
+        int pacmanNode = pacman.getCurrentNode(mp.pos[map_num], pacmanPosition, map_num);
         for (int i = 0; i < 4;i++) {
 
             if ((!pacman.gameOver  && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
-                if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList);
-                if (i == 2) target = ghosts[i]->Amoor(pacmanNode);
-                if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList);
+                if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList[map_num]);
+                if (i == 2) target = ghosts[i]->Amoor(pacmanNode,map_num);
+                if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList[map_num]);
 
                 ghosts[i]->ghostOut = 1;
 
                 if (ghosts[i]->isDead)
                 {
-                    target = 40 + (rand() % 3);
+                    target = (map_num?40:27) + (rand() % 3);
 					
                 }
                 else if (ghosts[i]->isPoisoned) {
-                    target = 1 + rand() % 90;
+                    target = 1 + rand() % (map_num ? 90 : 55);
 					//cout << "target is: " << target << endl;
                 }
-                ghosts[i]->update(deltaTime, mp.pos, target);
+                ghosts[i]->update(deltaTime, mp.pos[map_num], target);
                 if (ghosts[i]->isPoisoned)
                     allAreNotPoisened = false;
             }
@@ -235,8 +254,10 @@ void Gameplay() {
             }
         }
 
-        for (int i = 1; i <= 90; i++) {
-            if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+        vector<int> skips = ghostNodeBegins[map_num];
+        for (int i = 1; i <= (map_num ? 90 : 55); i++) {
+            for (auto x : skips)
+                if (i == x) continue;
 
             if ( pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
                 if (i == PowerUpNodes[0] or i == PowerUpNodes[1] or i == PowerUpNodes[2] or i == PowerUpNodes[3]) {
@@ -246,7 +267,7 @@ void Gameplay() {
                     }
                     sound.chasing(1);
                     pacman.walk_speed = 250;
-                    cout << "speed : " << pacman.walk_speed;
+                    //cout << "speed : " << pacman.walk_speed;
                 }
                 sound.eating();
                 pacman.nodes[i].setScale(0, 0);
@@ -257,9 +278,9 @@ void Gameplay() {
         ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
-
-        for (int i = 1; i <= 90; i++) {
-            if (i == 34 or i == 40 or i == 41 or i == 42) continue;
+        for (int i = 1; i <= (map_num ? 90 : 55); i++) {
+            for (auto x : skips)
+                if (i == x) continue;
             window.draw(pacman.nodes[i]);
             window.draw(nodeNums[i]);
         }

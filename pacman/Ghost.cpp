@@ -175,8 +175,7 @@ int Ghost::getCurrentNode() {
 
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(unordered_map<int, vector<int>> adjList)
 {
-    adjList[91].clear();
-    adjList[92].clear();
+
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
 
     for (auto& start_pair : adjList) {
@@ -234,8 +233,8 @@ void Ghost::reset(int startNode, vector<pair<int, int>>& pos) {
     timer = 0;
 }
 
-int Ghost::Amoor(int pacmanNode) {
-    vector<int> corners = { 1,10,81,90 };
+int Ghost::Amoor(int pacmanNode,int map_num) {
+    vector<int> corners[2] = { {1,11,45,55} ,{ 1, 10, 81, 90 } };
     if (allPaths[currentNode][pacmanNode].size() > 6)
         return pacmanNode;
     else {
@@ -243,7 +242,7 @@ int Ghost::Amoor(int pacmanNode) {
         int target = pacmanNode;
         int mnToPacNode = 100;
         int pacmanclosestnode = pacmanNode;
-        for (auto x : corners) {
+        for (auto x : corners[map_num]) {
             if (allPaths[pacmanNode][x].size() < mnToPacNode) {
                 mnToPacNode = allPaths[pacmanNode][x].size(), pacmanclosestnode = x;
             }
@@ -251,13 +250,13 @@ int Ghost::Amoor(int pacmanNode) {
         int pacmanclosest2 = pacmanNode;
         mnToPacNode = 100;
 
-        for (auto x : corners) {
+        for (auto x : corners[map_num]) {
             if (allPaths[pacmanNode][x].size() < mnToPacNode and x != pacmanclosestnode) {
                 mnToPacNode = allPaths[pacmanNode][x].size(), pacmanclosest2 = x;
             }
         }
 
-        for (auto x : corners)
+        for (auto x : corners[map_num])
             if (allPaths[currentNode][x].size() < mn and x != pacmanclosest2 and x != currentNode and x != pacmanclosestnode)
                 mn = allPaths[currentNode][x].size(), target = x;
 

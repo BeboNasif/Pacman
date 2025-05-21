@@ -8,11 +8,10 @@ class Player
 
 private:
     enum State { idle, wmove, smove, amove, dmove, dead };
-    Sprite& player;
     float playerdeltatime;
     float player_scale;
     Vector2f velocity;
-    Vector2f initial_position;
+   
     int ImageCounter;
     int maximagecounter;
     float AnimationCounter;
@@ -25,6 +24,8 @@ private:
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
+    Sprite& player;
+    Vector2f initial_position;
     static string playerName;
     static map<string, string> settings;
     float walk_speed;
@@ -38,17 +39,18 @@ public:
     int next_node;
 
     bool reachedNode;
-    Player(Sprite& p);
-    static void initSettings();
+    Player(Sprite& p, const Vector2f& startPos);
+    void setInitPos(Vector2f pos);
+    static void initSettings(int map_num);
     void setDeltaTime(float dt);
-    void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos);
-    void updateMovement(unordered_map<int, vector<int>> adj,vector<pair<int, int>>& pos);
+    void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos, int map_num);
+    void updateMovement(unordered_map<int, vector<int>> adj,vector<pair<int, int>>& pos, int map_num);
     void updatePlace(Vector2f window);
-    void updateAnimation(vector<Ghost*>& ghosts,Map &mp);
+    void updateAnimation(vector<Ghost*>& ghosts,Map &mp, int map_num);
     void die();
-    int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition);
+    int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition, int map_num);
 
 private:
     void resetAfterDeath();
-    void updateAnimationCounter(float speedThreshold, vector<Ghost*>& ghosts,Map &mp);
+    void updateAnimationCounter(float speedThreshold, vector<Ghost*>& ghosts,Map &mp,int map_num);
 };

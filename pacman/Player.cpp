@@ -8,23 +8,24 @@ extern int character;
 string Player::playerName = "Player1";
 map<string, string> Player::settings;
 
-Player::Player(Sprite& p) : player(p) {
+Player::Player(Sprite& p, const Vector2f& startPos) : player(p), initial_position(startPos) {
     velocity = { 0.f, 0.f };
     walk_speed = 150.f;
-    player_scale = (character == 1 ? 2.3 : 2.0);
+    player_scale = (character == 1 ? 2.3f : 2.0f);
     reachedNode = 1;
-    initial_position = { 880 + 20,789 + 20 };
+
     curr_state = idle;
     tmp_state = idle;
     player.setScale(player_scale, player_scale);
-    player.setPosition(initial_position); 
+    player.setPosition(initial_position);
+
     Idle.loadFromFile("Assets/Textures/pacman/neutral" + string(character == 1 ? "_m" : "") + ".png");
     live = 2;
     ImageCounter = 0;
     maximagecounter = 0;
     AnimationCounter = 0;
     cur_dir = left;
-    cur_node = 65; 
+    cur_node = 65;
 
     animationTextures[wmove] = vector<Texture>(2);
     animationTextures[smove] = vector<Texture>(2);
@@ -34,16 +35,24 @@ Player::Player(Sprite& p) : player(p) {
 
     for (int i = 0; i < 2; i++) {
         animationTextures[wmove][i].loadFromFile("Assets/Textures/pacman/up_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
-        animationTextures[smove][i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + (character == 1 ? "m":"") + ".png");
+        animationTextures[smove][i].loadFromFile("Assets/Textures/pacman/down_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
         animationTextures[amove][i].loadFromFile("Assets/Textures/pacman/left_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
         animationTextures[dmove][i].loadFromFile("Assets/Textures/pacman/right_" + to_string(i) + (character == 1 ? "m" : "") + ".png");
     }
+
     for (int i = 0; i < 11; i++) {
         animationTextures[dead][i].loadFromFile("Assets/Textures/pacman/d-" + to_string(i) + ".png");
     }
 }
 
-void Player::initSettings() {
+
+void Player::setInitPos(Vector2f pos)
+{
+    initial_position = pos;
+}
+
+void Player::initSettings(int map_num) {
+  
     settings = FilesController::getPlayerSettings(playerName);
     if (settings.empty()) {
         settings["moveLeftKey"] = "Left";
@@ -59,8 +68,8 @@ void Player::setDeltaTime(float dt) {
 }
 
 
-void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-  
+void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos, int map_num) {
+    
         // get the key pressed name 
         sf::Keyboard::Key moveLeftKey = KeyboardKEYS::KeyNameToKey(settings["moveLeftKey"]);
         sf::Keyboard::Key moveRightKey = KeyboardKEYS::KeyNameToKey(settings["moveRightKey"]);
@@ -84,17 +93,17 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
         }
 
         // Update the current node based on the player's position
-        cur_node = getCurrentNode(pos, player.getPosition());
-   
+        
+        cur_node = getCurrentNode(pos, player.getPosition(),map_num);
 }
 
-void Player::updateMovement(unordered_map<int, vector<int>> adj, vector<pair<int, int>>& pos) {
+void Player::updateMovement(unordered_map<int, vector<int>> adj, vector<pair<int, int>>& pos, int map_num) {
     adj[34].clear();
     adj[34].push_back(33), adj[34].push_back(35);
     Vector2f currentPos = player.getPosition();
     float invert = 1;
     if (curr_state != dead) {
-        for (int i = 1; i <= 90; i++) {
+        for (int i = 1; i <= (map_num ? 90 : 55); i++) {
             if (abs(pos[i].first - currentPos.x) < 3 && abs(pos[i].second - currentPos.y) < 3) {
                 int next_node = -1;
 
@@ -198,7 +207,7 @@ void Player::updatePlace(Vector2f window) {
 
 
 }
-void Player::updateAnimation(vector<Ghost*>& ghosts,Map &mp ) {
+void Player::updateAnimation(vector<Ghost*>& ghosts,Map &mp,int map_num ) {
     if (curr_state == idle) {
         player.setTexture(Idle);
         ImageCounter = 0;
@@ -209,16 +218,16 @@ void Player::updateAnimation(vector<Ghost*>& ghosts,Map &mp ) {
         player.setTexture(animationTextures[curr_state][ImageCounter]);
 
         if (curr_state == dead)
-            updateAnimationCounter(0.07f, ghosts, mp);
+            updateAnimationCounter(0.07f, ghosts, mp, map_num);
         else
-            updateAnimationCounter(0.08f,ghosts,mp);
+            updateAnimationCounter(0.08f,ghosts,mp, map_num);
     }
 
 
 }
 
 
-void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts, Map &mp) {
+void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts, Map &mp, int map_num) {
     AnimationCounter += playerdeltatime;
     if (AnimationCounter >= speedThreshold) {
         AnimationCounter = 0;
@@ -231,9 +240,10 @@ void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts,
                     cout << live << endl;
                     resetAfterDeath();
                     int i = 0;
-                    vector<int> starts = { 34,40,41,42 };
+                    vector<int> ghostNodeBegins[2] = { {17,27,28,29},{34,40,41,42} };
+                    vector<int>  starts = ghostNodeBegins[map_num];
                     for (auto& ghost : ghosts) {
-                        ghost->reset(starts[i], mp.pos);
+                        ghost->reset(starts[i], mp.pos[map_num]);
                         i++;
                     }
                 }
@@ -257,11 +267,11 @@ void Player::resetAfterDeath() {
     player.setPosition(initial_position);
 }
 
-int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition) {
+int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition,  int map_num) {
     int closestNode = -1;
     float minDistance = FLT_MAX;
 
-    for (int i = 1; i <= 90; i++) {
+    for (int i = 1; i <= (map_num ? 90 : 55); i++) {
         float distance = sqrt(pow(pos[i].first - playerPosition.x, 2) + pow(pos[i].second - playerPosition.y, 2));
         if (distance < minDistance) {
             minDistance = distance;
