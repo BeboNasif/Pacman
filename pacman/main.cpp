@@ -256,7 +256,7 @@ void Gameplay(int map_num) {
                 else {
 					sound.so2.stop();
 				    sound.dying();
-                    //pacman.die();
+                    pacman.die();
                     int prevMaxScore = stoi(pacman.settings["maxScore"]);
                     if (score > prevMaxScore) {
                         pacman.settings["maxScore"] = to_string(score);
