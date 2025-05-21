@@ -20,8 +20,6 @@ Player::Player(Sprite& p) : player(p) {
     player.setPosition(initial_position); 
     Idle.loadFromFile("Assets/Textures/pacman/neutral" + string(character == 1 ? "_m" : "") + ".png");
     live = 2;
-    animation_running = false;
-    isDead = false;
     ImageCounter = 0;
     maximagecounter = 0;
     AnimationCounter = 0;
@@ -62,7 +60,7 @@ void Player::setDeltaTime(float dt) {
 
 
 void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
-    if (!animation_running && curr_state != dead) {
+  
         // get the key pressed name 
         sf::Keyboard::Key moveLeftKey = KeyboardKEYS::KeyNameToKey(settings["moveLeftKey"]);
         sf::Keyboard::Key moveRightKey = KeyboardKEYS::KeyNameToKey(settings["moveRightKey"]);
@@ -87,7 +85,7 @@ void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, 
 
         // Update the current node based on the player's position
         cur_node = getCurrentNode(pos, player.getPosition());
-    }
+   
 }
 
 void Player::updateMovement(unordered_map<int, vector<int>> adj, vector<pair<int, int>>& pos) {
@@ -250,23 +248,12 @@ void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts,
     }
 }
 void Player::die() {
-    if (!isDead && !animation_running) {
         curr_state = dead;
-        animation_running = true;
-        ImageCounter = 0;
-        AnimationCounter = 0;
-        isDead = true;
-    }
 }
 
 void Player::resetAfterDeath() {
-    isDead = false; 
-    animation_running = false;
     curr_state = idle; 
     tmp_state = idle;
-    ImageCounter = 0;
-    AnimationCounter = 0;
-    player.setTexture(Idle);
     player.setPosition(initial_position);
 }
 

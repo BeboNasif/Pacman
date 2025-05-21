@@ -187,7 +187,7 @@ void Gameplay() {
         int pacmanNode = pacman.getCurrentNode(mp.pos, pacmanPosition);
         for (int i = 0; i < 4;i++) {
 
-            if ((!pacman.gameOver && !pacman.isDead && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
+            if ((!pacman.gameOver  && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
                 if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList);
@@ -216,7 +216,7 @@ void Gameplay() {
             pacman.walk_speed = 250;
 
         for (auto& ghost : ghosts) {
-            if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
+            if ( pacmanSprite.getGlobalBounds().intersects(ghost->getSprite().getGlobalBounds())) {
                 if (ghost->isPoisoned) {
 					sound.eat_ghost();
                     if(!ghost->isDead) ghost->die("Assets/DEAD2.png",score);
@@ -238,7 +238,7 @@ void Gameplay() {
         for (int i = 1; i <= 90; i++) {
             if (i == 34 or i == 40 or i == 41 or i == 42) continue;
 
-            if (!pacman.isDead && pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
+            if ( pacmanSprite.getGlobalBounds().intersects(pacman.nodes[i].getGlobalBounds())) {
                 if (i == PowerUpNodes[0] or i == PowerUpNodes[1] or i == PowerUpNodes[2] or i == PowerUpNodes[3]) {
                     for (auto& ghost : ghosts) {
                         if (ghost->ghostOut == 1)

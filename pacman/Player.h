@@ -16,7 +16,6 @@ private:
     int ImageCounter;
     int maximagecounter;
     float AnimationCounter;
-    bool animation_running;
     int live;
 
     State tmp_state;
@@ -37,7 +36,7 @@ public:
     State curr_state;
     int cur_node;
     int next_node;
-    bool isDead;
+
     bool reachedNode;
     Player(Sprite& p);
     static void initSettings();
