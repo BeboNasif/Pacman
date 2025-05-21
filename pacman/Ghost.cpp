@@ -9,8 +9,8 @@
 #include "Player.h"
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
 float Ghost::timer = 0;
+
 Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> adjList, vector<pair<int, int>> pos) {
-    timer = 0;
     texture.loadFromFile(texturePath);
     sprite.setTexture(texture);
     sprite.setOrigin(8, 8);
@@ -21,12 +21,12 @@ Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> 
     speed = 150.f;
 
     sprite.setTexture(texture);
-    sprite.setTextureRect(IntRect(0, 0, 16, 16)); // initial frame
+    sprite.setTextureRect(IntRect(0, 0, 16, 16));
 
     animationFrame = 0;
     animationTimer = 0.f;
     animationSpeed = 0.1f;
-    lastDir = { 1.f, 0.f }; // default direction (right)
+    lastDir = { 1.f, 0.f };
 
     sprite.setPosition(pos[startNode].first, pos[startNode].second);
 
@@ -35,29 +35,27 @@ Ghost::Ghost(int startNode, string texturePath, unordered_map<int, vector<int>> 
 void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
 {
     if (waitingAfterReturn) {
-        if (returnClock.getElapsedTime().asSeconds() >= 3.f) {
-            waitingAfterReturn = false; // Done waiting, continue as normal
-        }
-        else {
-            return; // Still waiting at base
-        }
+        if (returnClock.getElapsedTime().asSeconds() >= 3.f)
+            waitingAfterReturn = false;
+        else
+            return; 
+
     }
 
     Vector2f currentPos = sprite.getPosition();
     Vector2f nodePos(pos[currentNode].first, pos[currentNode].second);
 
-    // Check if ghost is exactly on a node (within small epsilon margin)
-    float epsilon = 0.1f;
-    if (abs(currentPos.x - nodePos.x) < epsilon && abs(currentPos.y - nodePos.y) < epsilon) {
-        sprite.setPosition(nodePos); // Snap exactly to node
+    float minDist = 0.1f;
+    if (abs(currentPos.x - nodePos.x) < minDist && abs(currentPos.y - nodePos.y) < minDist)
+    {
         // Only update path when standing on a node
-        if (allPaths.count(currentNode) && allPaths[currentNode].count(pacmanNode)) {
+        if (allPaths.count(currentNode) && allPaths[currentNode].count(pacmanNode)) 
+        {
             path = allPaths[currentNode][pacmanNode];
             pathIndex = 0;
         }
     }
 
-    // Prevent crash if no further movement in path
     if (pathIndex + 1 >= path.size())
         return;
 
@@ -68,7 +66,8 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
 
 
 
-    if (isDead) {
+    if (isDead) 
+    {
         int frameIndex = 0;
 
         if (abs(lastDir.x) > abs(lastDir.y)) {
@@ -86,33 +85,36 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
 
     }
 
-    if (isPoisoned) {
-        float elapsed = poisonedClock.getElapsedTime().asSeconds();
+    if (isPoisoned) 
+    {
+        float timerA = poisonedClock.getElapsedTime().asSeconds();
 
-        if (elapsed > poisonedDuration) {
+        if (timerA > poisonedDuration)
+        {
             isPoisoned = false;
-            return; // go back to normal update logic
+            return; 
         }
 
         int frame = 0;
-        if (elapsed < 5.f) {
-            frame = static_cast<int>((elapsed * 4)) % 2; // alternate between frame 0 and 1
-        }
-        else {
-            frame = static_cast<int>((elapsed - 5.f) * 4) % 4; // frames 2, 3, 4
-        }
+        if (timerA < 5.f) 
+            frame = (int)((timerA * 4)) % 2; // alternate between frame 1 and 2
 
-        poisonedSprite.setTextureRect(sf::IntRect(frame * 16, 0, 16, 16));
+        else 
+            frame = (int)((timerA - 5.f) * 4) % 4; // frames 1, 2, 3, 4
+
+        poisonedSprite.setTextureRect(IntRect(frame * 16, 0, 16, 16));
         poisonedSprite.setPosition(sprite.getPosition());
     }
 
 
 
-    if (distance < speed * deltaTime) {
+    if (distance < speed * deltaTime) 
+    {
         sprite.setPosition(targetPos);
         currentNode = path[pathIndex + 1];
         pathIndex++;
-        if (isDead and (currentNode == pacmanNode)) {
+        if (isDead and (currentNode == pacmanNode)) 
+        {
             ghostOut = 0;
             isDead = false;
             isPoisoned = false;
@@ -124,7 +126,9 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
             return;
         }
     }
-    else {
+
+    else 
+    {
         dir /= distance;
         lastDir = dir;
         sprite.move(dir * speed * deltaTime);
@@ -157,26 +161,45 @@ void Ghost::updateAnimation()
     sprite.setTextureRect(IntRect(frameX, 0, 16, 16));
 }
 
-void Ghost::draw(RenderWindow& window) {
-    if (isDead) {
-        window.draw(deadSprite);
-    }
-    else if (isPoisoned) {
-        window.draw(poisonedSprite);
-    }
-    else {
-        window.draw(sprite);
-    }
+bool Ghost::shouldUpdate(int i) {
+    return (isPoisoned || ghostOut || (i == 0) || (i == 1 && timer > 5) || (i == 2 && timer > 10) || (i == 3 && timer > 15));
+}
+
+void Ghost::poisoned(const string& poisonedTexturePath) {
+    if (waitingAfterReturn) return;
+    poisonedTexture.loadFromFile(poisonedTexturePath);
+    poisonedSprite.setTexture(poisonedTexture);
+    poisonedSprite.setTextureRect(IntRect(0, 0, 16, 16)); // start with first frame
+    poisonedSprite.setScale(3.5f, 3.5f);
+    poisonedSprite.setOrigin(8, 8);
+    poisonedSprite.setPosition(sprite.getPosition());
+    isPoisoned = true;
+    poisonedClock.restart();
+}
+
+void Ghost::die(const string& deadTexturePath, int& score) {
+    isDead = 1;
+    score += 50;
+    deadTexture.loadFromFile(deadTexturePath);
+    deadSprite.setTexture(deadTexture);
+    deadSprite.setTextureRect(IntRect(0, 0, 16, 16));
+    deadSprite.setScale(3.5f, 3.5f);
+    deadSprite.setOrigin(8, 8);
+    deadSprite.setPosition(sprite.getPosition());
+
 }
 
 int Ghost::getCurrentNode() {
     return currentNode;
 }
 
+
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(unordered_map<int, vector<int>> adjList, int map_num)
 {
     if (map_num) adjList[91].clear(), adjList[92].clear();
+
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
+
     for (auto& start_pair : adjList) {
         int start = start_pair.first;
 
@@ -217,9 +240,7 @@ unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(un
     return allPaths;
 }
 
-Sprite& Ghost::getSprite() {
-    return sprite;
-}
+
 
 void Ghost::reset(int startNode, vector<pair<int, int>>& pos) {
     path.clear();
@@ -232,7 +253,39 @@ void Ghost::reset(int startNode, vector<pair<int, int>>& pos) {
     timer = 0;
 }
 
-int Ghost::Amoor(int pacmanNode,int map_num) {
+
+// up : 0, down : 1, right : 2, left : 3
+
+int dfs(int node, int start, int limit, int steps, unordered_map<int, std::vector<int>>& adjList) {
+    if (steps == limit) return node;
+    for (auto child : adjList[node]) {
+        if (child == start) continue;
+        return dfs(child, start, limit, steps + 1, adjList);
+    }
+    return 0;
+}
+
+int getNext(int pacmanNode, int dir) {
+    int node = pacmanNode;
+    if (dir == 0) node = pacmanNode - 10;
+    if (dir == 1) node = pacmanNode + 10;
+    if (dir == 2) node = pacmanNode + 1;
+    if (dir == 3) node = pacmanNode - 1;
+    return node;
+}
+
+
+// Ghost Algorithms functions
+
+
+// red one --> chase you always 
+int Ghost::Blinky(int pacmanNode) {
+    return pacmanNode;
+}
+
+
+// orange one --> the confused one
+int Ghost::Clyde(int pacmanNode,int map_num) {
     vector<int> corners[2] = { {1,11,45,55} ,{ 1, 10, 81, 90 } };
     if (allPaths[currentNode][pacmanNode].size() > 6)
         return pacmanNode;
@@ -263,37 +316,19 @@ int Ghost::Amoor(int pacmanNode,int map_num) {
     }
 }
 
-int Ghost::Ad3k(int pacmanNode) {
-    return pacmanNode;
-}
 
-// up : 0, down : 1, right : 2, left : 3
-
-int dfs(int node, int start, int limit, int steps, unordered_map<int, std::vector<int>>& adjList) {
-    if (steps == limit) return node;
-    for (auto child : adjList[node]) {
-        if (child == start) continue;
-        return dfs(child, start, limit, steps + 1, adjList);
-    }
-    return 0;
-}
-int getNext(int pacmanNode, int dir) {
-    int node = pacmanNode;
-    if (dir == 0) node = pacmanNode - 10;
-    if (dir == 1) node = pacmanNode + 10;
-    if (dir == 2) node = pacmanNode + 1;
-    if (dir == 3) node = pacmanNode - 1;
-    return node;
-}
-
-int Ghost::EL7okooma(int pacmanNode, int dir, unordered_map<int, std::vector<int>>& adjList) {
+// pinky --> 3 steps ahead of pacman
+int Ghost::Pinky(int pacmanNode, int dir, unordered_map<int, std::vector<int>>& adjList) {
     // node -> the node pacman is directed to 
     int node = getNext(pacmanNode, dir);
     int limit = 3;
     return dfs(node, pacmanNode, limit, 0, adjList);
 
 }
-int Ghost::ELSaad(int pacmanNode, int dir, int Ad3kNode, unordered_map<int, std::vector<int>>& adjList)
+
+
+// inky --> 2 steps ahead of pacman + blinky distance
+int Ghost::Inky(int pacmanNode, int dir, int Ad3kNode, unordered_map<int, std::vector<int>>& adjList)
 {
     int node = getNext(pacmanNode, dir);
     int dist = allPaths[Ad3kNode][pacmanNode].size();
@@ -302,30 +337,22 @@ int Ghost::ELSaad(int pacmanNode, int dir, int Ad3kNode, unordered_map<int, std:
 
 }
 
-void Ghost::poisoned(const string& poisonedTexturePath) {
-    if (waitingAfterReturn) return;
-    poisonedTexture.loadFromFile(poisonedTexturePath);
-    poisonedSprite.setTexture(poisonedTexture);
-    poisonedSprite.setTextureRect(IntRect(0, 0, 16, 16)); // start with first frame
-    poisonedSprite.setScale(3.5f, 3.5f);
-    poisonedSprite.setOrigin(8, 8);
-    poisonedSprite.setPosition(sprite.getPosition());
-    isPoisoned = true;
-    poisonedClock.restart();
+
+
+
+
+Sprite& Ghost::getSprite() {
+    return sprite;
 }
 
-bool Ghost::shouldUpdate(int i) {
-    return (isPoisoned || ghostOut || (i == 0) || (i == 1 && timer > 5) || (i == 2 && timer > 10) || (i == 3 && timer > 15));
-}
-
-void Ghost::die(const string& deadTexturePath, int& score) {
-    isDead = 1;
-    score += 50;
-    deadTexture.loadFromFile(deadTexturePath);
-    deadSprite.setTexture(deadTexture);
-    deadSprite.setTextureRect(IntRect(0, 0, 16, 16));
-    deadSprite.setScale(3.5f, 3.5f);
-    deadSprite.setOrigin(8, 8);
-    deadSprite.setPosition(sprite.getPosition());
-
+void Ghost::draw(RenderWindow& window) {
+    if (isDead) {
+        window.draw(deadSprite);
+    }
+    else if (isPoisoned) {
+        window.draw(poisonedSprite);
+    }
+    else {
+        window.draw(sprite);
+    }
 }

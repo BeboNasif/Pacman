@@ -58,13 +58,14 @@ void Gameplay(int map_num) {
     int idx = 0;
     Ghost redGhost(ghostNodeBegins[map_num][idx++], "Assets/red.png", mp.adjList[map_num], mp.pos[map_num]);
     Ghost pinkGhost(ghostNodeBegins[map_num][idx++], "Assets/pink.png", mp.adjList[map_num], mp.pos[map_num]);
-    Ghost blueGhost(ghostNodeBegins[map_num][idx++], "Assets/cyan.png", mp.adjList[map_num], mp.pos[map_num]);
     Ghost yellowGhost(ghostNodeBegins[map_num][idx++], "Assets/yellow.png", mp.adjList[map_num], mp.pos[map_num]);
+    Ghost blueGhost(ghostNodeBegins[map_num][idx++], "Assets/cyan.png", mp.adjList[map_num], mp.pos[map_num]);
+
     Texture poisonedTexture;
     poisonedTexture.loadFromFile("Assets/poisoned.png");
 
 
-    vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
+    vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &yellowGhost ,&blueGhost};
 
     Vector2f pos = {0,0};
     pos = {(float) mp.pos[map_num][map_num?65 : 50].first ,(float)mp.pos[map_num][map_num ? 65 : 50].second };
@@ -211,10 +212,10 @@ void Gameplay(int map_num) {
 
             if ((!pacman.gameOver  && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
                 int target = 0;
-                if (i == 0) target = ghosts[i]->Ad3k(pacmanNode);
-                if (i == 1) target = ghosts[i]->EL7okooma(pacmanNode, pacman.curr_state, mp.adjList[map_num]);
-                if (i == 2) target = ghosts[i]->Amoor(pacmanNode,map_num);
-                if (i == 3) target = ghosts[i]->ELSaad(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList[map_num]);
+                if (i == 0) target = ghosts[i]->Blinky(pacmanNode);
+                if (i == 1) target = ghosts[i]->Pinky(pacmanNode, pacman.curr_state, mp.adjList[map_num]);
+                if (i == 2) target = ghosts[i]->Clyde(pacmanNode,map_num);
+                if (i == 3) target = ghosts[i]->Inky(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList[map_num]);
 
                 ghosts[i]->ghostOut = 1;
 
