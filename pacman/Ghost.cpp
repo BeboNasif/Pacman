@@ -47,14 +47,13 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
     Vector2f nodePos(pos[currentNode].first, pos[currentNode].second);
 
     float minDist = 0.1f;
+
+    // Only update path when standing on a node
     if (abs(currentPos.x - nodePos.x) < minDist && abs(currentPos.y - nodePos.y) < minDist)
     {
-        // Only update path when standing on a node
-        if (allPaths.count(currentNode) && allPaths[currentNode].count(pacmanNode)) 
-        {
-            path = allPaths[currentNode][pacmanNode];
-            pathIndex = 0;
-        }
+        path = allPaths[currentNode][pacmanNode];
+        pathIndex = 0;
+        
     }
 
     if (pathIndex + 1 >= path.size())
