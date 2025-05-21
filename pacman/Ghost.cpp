@@ -106,14 +106,14 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
         poisonedSprite.setPosition(sprite.getPosition());
     }
 
-    
+
 
     if (distance < speed * deltaTime) {
         sprite.setPosition(targetPos);
         currentNode = path[pathIndex + 1];
         pathIndex++;
         if (isDead and (currentNode == pacmanNode)) {
-			ghostOut = 0;
+            ghostOut = 0;
             isDead = false;
             isPoisoned = false;
             sprite.setTexture(texture);
@@ -121,7 +121,7 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
 
             waitingAfterReturn = true;
             returnClock.restart();
-            return; 
+            return;
         }
     }
     else {
@@ -136,7 +136,7 @@ void Ghost::update(float deltaTime, vector<pair<int, int>>& pos, int pacmanNode)
 
 void Ghost::updateAnimation()
 {
-	speed = 150.f;
+    speed = 150.f;
     animationTimer += animationSpeed;
     if (animationTimer >= 1.f) {
         animationTimer = 0.f;
@@ -319,7 +319,7 @@ bool Ghost::shouldUpdate(int i, float timer) {
     return (isPoisoned || ghostOut || (i == 0) || (i == 1 && timer > 5) || (i == 2 && timer > 10) || (i == 3 && timer > 15));
 }
 
-void Ghost::die(const string& deadTexturePath, int& score) {   
+void Ghost::die(const string& deadTexturePath, int& score) {
     isDead = 1;
     score += 50;
     deadTexture.loadFromFile(deadTexturePath);
