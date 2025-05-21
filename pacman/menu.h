@@ -10,17 +10,19 @@ public:
     void player_name_input(RenderWindow& window);
     void Play_menu(RenderWindow& window);
     void GFX(RenderWindow& window);
-	void sound_options(RenderWindow& window);
+    void sound_options(RenderWindow& window);
     void player_controls(RenderWindow& window);
     void options_menu(RenderWindow& window);
-	void credits(RenderWindow& window);
-	void instructions(RenderWindow& window);
-	void Pause(RenderWindow& window, Texture gametexture);
+    void credits(RenderWindow& window);
+    void instructions(RenderWindow& window);
+    void Pause(RenderWindow& window, Texture gametexture);
     bool exit = 0;
+    bool play_again = 0;
     bool show_name_input = true;
 
 
 private:
+    static void set_sounds();
     void updateFaces(float dt);
     void Face_intilization();
     void MoveDown(int& sel, int choices);
@@ -55,5 +57,4 @@ private:
     Clock deltaClock;
     float positionOfFace;
 
-    bool play_again = 0;
 };

@@ -51,6 +51,8 @@ void Player::initSettings() {
         settings["moveUpkey"] = "Up";
         settings["moveDownkey"] = "Down";
         settings["maxScore"] = "0";
+        settings["sound"] = "100";
+        settings["music"] = "100";
     }
 }
 

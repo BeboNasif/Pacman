@@ -9,8 +9,6 @@ using namespace sf;
 menu_Bg menu_UI;
 bool pressed = false;
 bool esc_button = false;
-int P_M_Sound = 100;
-int P_M_Music = 100;
 extern Sounds sound;
 int character = 0;
 extern bool END;
@@ -18,6 +16,9 @@ extern bool END;
 bool waitingForKey = false;
 int actionToChange;
 void Gameplay();
+
+
+
 
 Menu::Menu()
     : choises(0)
@@ -36,7 +37,16 @@ Menu::Menu()
     pillConsumed.assign(3, false);
     pillDelayStarted.assign(3, false);
     pillTimers.assign(3, Clock{});
-    
+
+}
+
+void Menu::set_sounds() {
+    sound.so.setVolume(stoi(Player::settings["sound"]));
+    sound.so2.setVolume(stoi(Player::settings["sound"]));
+    sound.so4.setVolume(stoi(Player::settings["sound"]));
+    sound.so5.setVolume(stoi(Player::settings["sound"]));
+    sound.so6.setVolume(stoi(Player::settings["sound"]));
+    sound.bgmusic.setVolume(stoi(Player::settings["music"]));
 }
 void Menu::player_name_input(RenderWindow& window)
 {
@@ -78,10 +88,10 @@ void Menu::player_name_input(RenderWindow& window)
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
-                {
-                    window.close();
-                    FilesController::updatePlayerSettings(Player::playerName, Player::settings);
-                }
+            {
+                window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
 
             if (event.type == Event::KeyPressed)
             {
@@ -141,18 +151,18 @@ void Menu::player_name_input(RenderWindow& window)
         window.draw(headerText);
         window.draw(inputText);
         window.draw(instructionText);
-        
+
         for (auto& p : nameMenu.pills)
             window.draw(p);
         window.draw(nameMenu.DownFace);
-        
+
         window.display();
     }
-    
+
 }
 void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Menu& menu9) {
-	if (KeyboardKEYS::keyboardKeyToString(newKey) == "Escape")
-		return;
+    if (KeyboardKEYS::keyboardKeyToString(newKey) == "Escape")
+        return;
     if (action == 0) {
         Player::settings["moveLeftKey"] = KeyboardKEYS::keyboardKeyToString(newKey);
         FilesController::updatePlayerSettings(Player::playerName, Player::settings);
@@ -173,7 +183,7 @@ void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Menu& menu9) {
 
 void Menu::updateFaces(float dt)
 {
-    
+
     DownFace.move(downFaceSpeed * dt, 0);
 
     for (int i = 0; i < 3; ++i) {
@@ -222,8 +232,8 @@ void Menu::updateFaces(float dt)
         DownFace.setTexture(&faceFrames[currentFrame]);
         animationClock.restart();
     }
-    if(DownFace.getPosition().x>600)
-		DownFace.setPosition(400.f, 1000.f);
+    if (DownFace.getPosition().x > 600)
+        DownFace.setPosition(400.f, 1000.f);
 }
 
 void Menu::Face_intilization()
@@ -297,6 +307,7 @@ void Menu::MoveUp(int& selected, int choises)
 
 void Menu::menu1(RenderWindow& window)
 {
+    set_sounds();
     font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
     sound.music(0);
     choises = 7;
@@ -346,6 +357,25 @@ void Menu::menu1(RenderWindow& window)
                 {
                     if (selected == 0)
                         Play_menu(window);
+                    if (selected == 2)
+                    {
+                        if (show_name_input) {
+                            player_name_input(window);
+                        }
+                        // Ensure settings file exists
+
+                        try {
+                            ifstream settingsFile("Settings.txt");
+                            if (!settingsFile) {
+                                ofstream createSettings("Settings.txt");
+                                createSettings.close();
+                            }
+                        }
+                        catch (...) {
+                            ofstream createSettings("Settings.txt");
+                            createSettings.close();
+                        }
+                    }
                     if (selected == 1)
                         instructions(window);
                     if (selected == 4)
@@ -361,7 +391,7 @@ void Menu::menu1(RenderWindow& window)
                     mainmenu[selected].setFillColor(Color::White);
                     selected = 6;
                     mainmenu[6].setFillColor(Color{ 255,204,0 });
-                    Face.setPosition(Face.getPosition().x, midY + 7 * positionOfFace-15);
+                    Face.setPosition(Face.getPosition().x, midY + 7 * positionOfFace - 15);
                 }
             }
         }
@@ -405,7 +435,7 @@ void Menu::Play_menu(RenderWindow& window)
     }
 
     menu2.deltaClock.restart();
-    
+
     while (window.isOpen()) {
         Event evt;
         while (window.pollEvent(evt)) {
@@ -427,7 +457,7 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.mainmenu[menu2.selected].setFillColor(Color::White);
                     menu2.selected = 2;
                     menu2.mainmenu[2].setFillColor(Color{ 255,204,0 });
-                    menu2.Face.setPosition(menu2.Face.getPosition().x, midY + 3 * positionOfFace -15);
+                    menu2.Face.setPosition(menu2.Face.getPosition().x, midY + 3 * positionOfFace - 15);
                 }
                 if (evt.key.code == Keyboard::Down)
                     menu2.MoveDown(menu2.selected, 3);
@@ -435,10 +465,11 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.MoveUp(menu2.selected, 3);
 
                 if (evt.key.code == Keyboard::Enter) {
-					sound.bgmusic.pause();
+                    sound.bgmusic.pause();
                     if (menu2.selected == 0) Gameplay();
                     else if (menu2.selected == 1) Gameplay();
-					sound.bgmusic.play();
+                    if (!play_again)
+                        sound.bgmusic.play();
                 }
             }
         }
@@ -548,7 +579,7 @@ void  Menu::GFX(RenderWindow& window)
         }
 
         chara.setScale(2.4, 2.4);
-        chara.setPosition(1200, midY+50);
+        chara.setPosition(1200, midY + 50);
 
         window.clear();
         menu_UI.back_ground(window);
@@ -591,11 +622,11 @@ void Menu::sound_options(RenderWindow& window)
         yOffset += menu6.positionOfFace;
     }
 
-    RectangleShape barSound({ P_M_Sound * 3.f, 40.f });
+    RectangleShape barSound({ stoi(Player::settings["sound"]) * 3.f, 40.f });
     barSound.setFillColor({ 255, 255, 0 });
     barSound.setPosition(970, midY + 1 * menu6.positionOfFace);
 
-    RectangleShape barMusic({ P_M_Music * 3.f, 40.f });
+    RectangleShape barMusic({ stoi(Player::settings["music"]) * 3.f, 40.f });
     barMusic.setFillColor({ 255, 255, 0 });
     barMusic.setPosition(970, midY + 2 * menu6.positionOfFace);
 
@@ -629,7 +660,10 @@ void Menu::sound_options(RenderWindow& window)
                     || (event.key.code == Keyboard::Escape && menu6.selected == 2))
                 {
                     if (menu6.selected == 2)
+                    {
+                        FilesController::updatePlayerSettings(Player::playerName, Player::settings);
                         return;
+                    }
                 }
                 if (event.key.code == Keyboard::Escape && menu6.selected != 2)
                 {
@@ -638,34 +672,31 @@ void Menu::sound_options(RenderWindow& window)
                     menu6.mainmenu[2].setFillColor(Color{ 255,204,0 });
                     menu6.Face.setPosition(
                         menu6.Face.getPosition().x,
-						midY + 3 * menu6.positionOfFace - 15
+                        midY + 3 * menu6.positionOfFace - 15
                     );
                 }
 
                 if (menu6.selected == 0)
                 {
                     if (Keyboard::isKeyPressed(Keyboard::Left))
-                        P_M_Sound = std::max(0, P_M_Sound - 10);
+                        Player::settings["sound"] = to_string(std::max(0, stoi(Player::settings["sound"]) - 10));
                     if (Keyboard::isKeyPressed(Keyboard::Right))
-                        P_M_Sound = std::min(100, P_M_Sound + 10);
+                        Player::settings["sound"] = to_string(std::min(100, stoi(Player::settings["sound"]) + 10));
 
-                    barSound.setSize({ P_M_Sound * 3.f, 40.f });
-                    sound.so.setVolume(P_M_Sound);
-                    sound.so2.setVolume(P_M_Sound);
-                    sound.so4.setVolume(P_M_Sound);
-                    sound.so5.setVolume(P_M_Sound);
-                    sound.so6.setVolume(P_M_Sound);
+                    barSound.setSize({ stoi(Player::settings["sound"]) * 3.f, 40.f });
                 }
                 else if (menu6.selected == 1)
                 {
                     if (Keyboard::isKeyPressed(Keyboard::Left))
-                        P_M_Music = max(0, P_M_Music - 10);
+                        Player::settings["music"] = to_string(std::max(0, stoi(Player::settings["music"]) - 10));
+                    //P_M_Music = max(0, P_M_Music - 10);
                     if (Keyboard::isKeyPressed(Keyboard::Right))
-                        P_M_Music = min(100, P_M_Music + 10);
+                        Player::settings["music"] = to_string(std::min(100, stoi(Player::settings["music"]) + 10));
+                    //P_M_Music = min(100, P_M_Music + 10);
 
-                    barMusic.setSize({ P_M_Music * 3.f, 40.f });
-                    sound.bgmusic.setVolume(P_M_Music);
+                    barMusic.setSize({ stoi(Player::settings["music"]) * 3.f, 40.f });
                 }
+                menu6.set_sounds();
             }
         }
 
@@ -758,10 +789,11 @@ void Menu::player_controls(RenderWindow& window)
                         menu9.selected = 4;
                         menu9.mainmenu[4].setFillColor(Color{ 255, 204, 0 });
                         menu9.Face.setPosition(menu9.Face.getPosition().x, midY + 5 * menu9.positionOfFace - 15);
-						pressed = true;
+                        pressed = true;
                     }
-                    if (((event.key.code == Keyboard::Enter && menu9.selected == 4) || (event.key.code == Keyboard::Escape && menu9.selected == 4))&& !pressed)
+                    if (((event.key.code == Keyboard::Enter && menu9.selected == 4) || (event.key.code == Keyboard::Escape && menu9.selected == 4)) && !pressed)
                     {
+                        FilesController::updatePlayerSettings(Player::playerName, Player::settings);
                         return;
                     }
                     else if (event.key.code == Keyboard::Enter)
@@ -883,7 +915,7 @@ void Menu::options_menu(RenderWindow& window)
                     menu4.selected = 3;
                     menu4.mainmenu[3].setFillColor(Color{ 255,204,0 });
                     menu4.Face.setPosition(menu4.Face.getPosition().x,
-                        midY + 4 * menu4.positionOfFace-15);
+                        midY + 4 * menu4.positionOfFace - 15);
                 }
                 if (event.key.code == Keyboard::Enter
                     || (event.key.code == Keyboard::Escape && menu4.selected == 3))
@@ -916,7 +948,7 @@ void  Menu::credits(RenderWindow& window)
     cre.loadFromFile("Assets/Textures/d7k.jpg");
     Sprite credits;
     credits.setTexture(cre);
-	credits.scale(5, 5);
+    credits.scale(5, 5);
     while (window.isOpen())
     {
         Event event;
@@ -1030,11 +1062,11 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
     option.Face.setPosition(630, 220);
     option.positionOfFace = 100;
 
-    RectangleShape Sound(Vector2f(P_M_Sound * 3, 40));
+    RectangleShape Sound(Vector2f(stoi(Player::settings["sound"]) * 3, 40));
     Sound.setFillColor({ 255, 255, 0 });
     Sound.setPosition(885, 220);
 
-    RectangleShape Music(Vector2f(P_M_Music * 3, 40));
+    RectangleShape Music(Vector2f(stoi(Player::settings["music"]) * 3, 40));
     Music.setFillColor({ 255, 255, 0 });
     Music.setPosition(885, 320);
 
@@ -1084,10 +1116,9 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
                         }
                     }
 
-                    if (!Keyboard::isKeyPressed(Keyboard::Escape))
-                    {
+
+                    if (event.type == Event::KeyReleased)
                         pressed = false;
-                    }
                 }
                 else if (op)
                 {
@@ -1116,54 +1147,21 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
                     }
                     if (option.selected == 0)
                     {
-                        if (event.key.code == sf::Keyboard::Left)
-                        {
-                            if (P_M_Sound > 0)
-                                P_M_Sound -= 10;
-                            else
-                                P_M_Sound = 0;
-                        }
-                        if (event.key.code == sf::Keyboard::Right)
-                        {
-                            if (P_M_Sound < 100)
-                                P_M_Sound += 10;
-                            else
-                                P_M_Sound = 100;
-                        }
-                        Sound.setSize(Vector2f(P_M_Sound * 3, 40));
-                        sound.so.setVolume(P_M_Sound);
-                        sound.so2.setVolume(P_M_Sound);
-                        sound.so4.setVolume(P_M_Sound);
-                        sound.so5.setVolume(P_M_Sound);
-                        sound.so6.setVolume(P_M_Sound);
-                        sound.so7.setVolume(P_M_Sound);
-                        sound.so8.setVolume(P_M_Sound);
-                        sound.so9.setVolume(P_M_Sound);
-                        sound.so10.setVolume(P_M_Sound);
-                        sound.so11.setVolume(P_M_Sound);
-                        sound.so12.setVolume(P_M_Sound);
-                        sound.so13.setVolume(P_M_Sound);
+                        if (event.key.code == Keyboard::Left)
+                            Player::settings["sound"] = to_string(std::max(0, stoi(Player::settings["sound"]) - 10));
+                        if (event.key.code == Keyboard::Right)
+                            Player::settings["sound"] = to_string(std::min(100, stoi(Player::settings["sound"]) + 10));
+                        Sound.setSize(Vector2f(stoi(Player::settings["sound"]) * 3, 40));
                     }
                     else if (option.selected == 1)
                     {
                         if (event.key.code == Keyboard::Left)
-                        {
-                            if (P_M_Music > 0)
-                                P_M_Music -= 10;
-                            else
-                                P_M_Music = 0;
-                        }
+                            Player::settings["music"] = to_string(std::max(0, stoi(Player::settings["music"]) - 10));
                         if (event.key.code == Keyboard::Right)
-                        {
-                            if (P_M_Music < 100)
-                                P_M_Music += 10;
-                            else
-                                P_M_Music = 100;
-                        }
+                            Player::settings["music"] = to_string(std::min(100, stoi(Player::settings["music"]) + 10));
+                        Music.setSize(Vector2f(stoi(Player::settings["music"]) * 3, 40));
                     }
-                    Music.setSize(Vector2f(P_M_Music * 3, 40));
-                    sound.bgmusic.setVolume(P_M_Music);
-
+                    option.set_sounds();
 
                     if (!Keyboard::isKeyPressed(Keyboard::Escape))
                     {
