@@ -374,6 +374,7 @@ void Menu::menu1(RenderWindow& window)
                             ofstream createSettings("Settings.txt");
                             createSettings.close();
                         }
+						set_sounds();
                     }
                     if (selected == 1)
                         instructions(window);
