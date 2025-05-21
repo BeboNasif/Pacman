@@ -36,7 +36,7 @@ Menu::Menu()
     pillConsumed.assign(3, false);
     pillDelayStarted.assign(3, false);
     pillTimers.assign(3, Clock{});
-    Player::initSettings();
+    
 }
 void Menu::player_name_input(RenderWindow& window)
 {
@@ -95,6 +95,7 @@ void Menu::player_name_input(RenderWindow& window)
                     // Set the player name in the Player class
                     Player::playerName = playerName;
                     // sound.playMenuSelect();
+                    Player::initSettings();
                     return;
                 }
                 else if (event.key.code == Keyboard::BackSpace && !playerName.empty())
@@ -147,6 +148,7 @@ void Menu::player_name_input(RenderWindow& window)
         
         window.display();
     }
+    
 }
 void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Menu& menu9) {
 	if (KeyboardKEYS::keyboardKeyToString(newKey) == "Escape")
@@ -286,6 +288,8 @@ void Menu::MoveUp(int& selected, int choises)
         selected--;
         if (selected == -1)
         {
+            selected = choises - 1;
+            Face.setPosition(Face.getPosition().x, Face.getPosition().y + (positionOfFace * choises));
         }
         mainmenu[selected].setFillColor(Color{ 255,204,0 });
     }

@@ -20,6 +20,7 @@ extern bool pressed;
 
 void Gameplay() {
 	sound.startup();
+    string maxscore = Player::settings["maxScore"];
     int score = 0;
     Sprite pacmanSprite;
     pacmanSprite.setOrigin(11, 11);
@@ -34,7 +35,9 @@ void Gameplay() {
     MapSprite.setOrigin(mapText.getSize().x / 2.f, mapText.getSize().y / 2.f);
     MapSprite.setPosition(1920 / 2.f, 1080 / 2.f);
     Text Score;
+    Text MaxScore;
     Text ScoreVal;
+    Text MaxScoreVal;
     mp.init();
     //mp.printAdjList();
 
@@ -67,6 +70,15 @@ void Gameplay() {
     ScoreVal.setPosition(300, 0);
     Score.setString("Score ");
     ScoreVal.setString(": " + to_string(score));
+
+    MaxScore.setFont(fnt);
+    MaxScoreVal.setFont(fnt2);
+    MaxScore.setScale(2, 2);
+    MaxScoreVal.setScale(2, 2);
+    MaxScore.setPosition(50, 100);
+    MaxScoreVal.setPosition(200, 150);
+    MaxScore.setString("Max Score ");
+    MaxScoreVal.setString(" " + maxscore);
 
     for (int i = 1; i <= 92; i++) {
         CircleShape c(3);
@@ -261,6 +273,8 @@ void Gameplay() {
         window.draw(Score);
         window.draw(ScoreVal);
 
+        window.draw(MaxScore);
+        window.draw(MaxScoreVal);
         window.display();
     }
 
@@ -274,23 +288,25 @@ void Gameplay() {
 }
 
 int main() {
+    cout << "zebbi" << endl;
     window.setFramerateLimit(120);
     // Show player name input menu first if it's the first time
     if (menu.show_name_input) {
         menu.player_name_input(window);
     }
     // Ensure settings file exists
+    cout << "zebbi2" << endl;
     try {
-        ifstream settingsFile("Assets/Settings.txt");
+        ifstream settingsFile("Settings.txt");
         if (!settingsFile) {
-            ofstream createSettings("Assets/Settings.txt");
+            ofstream createSettings("Settings.txt");
             createSettings.close();
         }
     } catch (...) {
-        ofstream createSettings("Assets/Settings.txt");
+        ofstream createSettings("Settings.txt");
         createSettings.close();
     }
-    
+    cout << "zebbi3" << endl;
     menu.menu1(window);
     
     
