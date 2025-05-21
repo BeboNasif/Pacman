@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FilesController.cpp" />
     <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="KeyboardKEYS.cpp" />
     <ClCompile Include="main.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="Sounds.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FilesController.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="include.h" />
     <ClInclude Include="Map.h" />
