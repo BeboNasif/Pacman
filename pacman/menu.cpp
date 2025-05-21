@@ -48,6 +48,7 @@ void Menu::set_sounds() {
     sound.so6.setVolume(stoi(Player::settings["sound"]));
     sound.bgmusic.setVolume(stoi(Player::settings["music"]));
 }
+
 void Menu::player_name_input(RenderWindow& window)
 {
     cerr << 1 << endl;
@@ -160,6 +161,7 @@ void Menu::player_name_input(RenderWindow& window)
     }
 
 }
+
 void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Menu& menu9) {
     if (KeyboardKEYS::keyboardKeyToString(newKey) == "Escape")
         return;
@@ -512,7 +514,7 @@ void  Menu::GFX(RenderWindow& window)
     const int players = 2;
     Texture pl[players];
     pl[0].loadFromFile("Assets/Textures/pacman/1.png");
-    pl[1].loadFromFile("Assets/Textures/pacman/left_0m.png");
+    pl[1].loadFromFile("Assets/Textures/pacman/left_1m.png");
 
     Sprite chara;
     menu5.deltaClock.restart();

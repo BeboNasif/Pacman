@@ -14,11 +14,21 @@ Sounds sound;
 RenderWindow window(VideoMode(1920, 1080), "Pacman", Style::Close);
 
 Text nodeNums[95];
-
+extern int character;
 bool END = 1;
 extern bool pressed;
 
 void Gameplay() {
+    Texture lives;
+    lives.loadFromFile("Assets/Textures/pacman/right_" + to_string(1) + (character == 1 ? "m" : "") + ".png");
+	Sprite livesSprite[2];
+    for (int i = 0; i < 2; i++)
+    {
+        livesSprite[i].setTexture(lives);
+        livesSprite[i].setPosition(50*(i+1)+i*50, 900);
+		livesSprite[i].setScale(3, 3);
+    }
+
 	sound.startup();
     string maxscore = Player::settings["maxScore"];
     int score = 0;
@@ -274,6 +284,12 @@ void Gameplay() {
 
         window.draw(MaxScore);
         window.draw(MaxScoreVal);
+
+        for (int i = 0; i < pacman.live; i++)
+        {
+			window.draw(livesSprite[i]);
+        }
+
         window.display();
     }
 

@@ -16,7 +16,6 @@ private:
     int ImageCounter;
     int maximagecounter;
     float AnimationCounter;
-    int live;
 
     State tmp_state;
 
@@ -25,6 +24,7 @@ private:
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
+    int live;
     static string playerName;
     static map<string, string> settings;
     float walk_speed;
