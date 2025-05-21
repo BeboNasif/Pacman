@@ -275,8 +275,8 @@ int dfs(int node, int start, int limit, int steps, unordered_map<int, std::vecto
     for (auto child : adjList[node]) {
         if (child == start) continue;
         return dfs(child, start, limit, steps + 1, adjList);
-        break;
     }
+    return 0;
 }
 int getNext(int pacmanNode, int dir) {
     int node = pacmanNode;

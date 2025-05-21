@@ -1,13 +1,12 @@
 ﻿#include "Player.h"
 #include "include.h"
-
+#include "FilesController.h"
+#include "KeyboardKEYS.h"
 using namespace sf;
 
-Keyboard::Key moveLeftKey = Keyboard::Left;
-Keyboard::Key moveRightKey = Keyboard::Right;
-Keyboard::Key moveUpkey = Keyboard::Up;
-Keyboard::Key moveDownkey = Keyboard::Down;
 extern int character;
+string Player::playerName = "Player1";
+map<string, string> Player::settings;
 
 Player::Player(Sprite& p) : player(p) {
     velocity = { 0.f, 0.f };
@@ -46,6 +45,17 @@ Player::Player(Sprite& p) : player(p) {
     }
 }
 
+void Player::initSettings() {
+    settings = FilesController::getPlayerSettings(playerName);
+    if (settings.empty()) {
+        settings["moveLeftKey"] = "Left";
+        settings["moveRightKey"] = "Right";
+        settings["moveUpkey"] = "Up";
+        settings["moveDownkey"] = "Down";
+        settings["maxScore"] = "0";
+    }
+}
+
 void Player::setDeltaTime(float dt) {
     playerdeltatime = dt;
 }
@@ -53,6 +63,11 @@ void Player::setDeltaTime(float dt) {
 
 void Player::handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos) {
     if (!animation_running && curr_state != dead) {
+        // get the key pressed name 
+        sf::Keyboard::Key moveLeftKey = KeyboardKEYS::KeyNameToKey(settings["moveLeftKey"]);
+        sf::Keyboard::Key moveRightKey = KeyboardKEYS::KeyNameToKey(settings["moveRightKey"]);
+        sf::Keyboard::Key moveUpkey = KeyboardKEYS::KeyNameToKey(settings["moveUpkey"]);
+        sf::Keyboard::Key moveDownkey = KeyboardKEYS::KeyNameToKey(settings["moveDownkey"]);
         if (Keyboard::isKeyPressed(moveLeftKey)) {
             cur_dir = left;
             tmp_state = amove;
@@ -268,4 +283,3 @@ int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f p
     }
     return closestNode;
 }
-

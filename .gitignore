@@ -11,6 +11,9 @@
 *.sln.docstates
 *.json
 *.o
+run.sh
+/pacman/main
+Settings.txt
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

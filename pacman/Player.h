@@ -1,6 +1,7 @@
 #pragma once
 #include "include.h"
 #include <unordered_map>
+#include "menu.h" 
 
 class Player
 {
@@ -9,7 +10,6 @@ private:
     enum State { idle, wmove, smove, amove, dmove, dead };
     Sprite& player;
     float playerdeltatime;
-  
     float player_scale;
     Vector2f velocity;
     Vector2f initial_position;
@@ -26,7 +26,8 @@ private:
     unordered_map<State, vector<Texture>> animationTextures;
 
 public:
-    
+    static string playerName;
+    static map<string, string> settings;
     float walk_speed;
     CircleShape nodes[93];
     enum Dir { up, down, right, left };
@@ -39,6 +40,7 @@ public:
     bool isDead;
     bool reachedNode;
     Player(Sprite& p);
+    static void initSettings();
     void setDeltaTime(float dt);
     void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos);
     void updateMovement(unordered_map<int, vector<int>> adj,vector<pair<int, int>>& pos);

@@ -1,6 +1,9 @@
-﻿#include "Menu.h"
+﻿#include "menu.h"
+#include "KeyboardKEYS.h"
 #include "menu_Bg.h"
 #include "Sounds.h"
+#include "Player.h"
+#include "FilesController.h"
 using namespace sf;
 
 menu_Bg menu_UI;
@@ -14,10 +17,6 @@ extern bool END;
 
 bool waitingForKey = false;
 int actionToChange;
-extern Keyboard::Key moveLeftKey;
-extern Keyboard::Key moveRightKey;
-extern Keyboard::Key moveUpkey;
-extern Keyboard::Key moveDownkey;
 void Gameplay();
 
 Menu::Menu()
@@ -37,22 +36,136 @@ Menu::Menu()
     pillConsumed.assign(3, false);
     pillDelayStarted.assign(3, false);
     pillTimers.assign(3, Clock{});
+    Player::initSettings();
 }
+void Menu::player_name_input(RenderWindow& window)
+{
+    cerr << 1 << endl;
+    Menu nameMenu;
+    nameMenu.Face_intilization();
+    nameMenu.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
 
-void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey, Menu& menu9) {
-	if (keyboardKeyToString(newKey) == "Escape")
+    Text headerText;
+    headerText.setFont(nameMenu.font);
+    headerText.setCharacterSize(60);
+    headerText.setString("ENTER YOUR NAME");
+    headerText.setPosition(680, 300);
+    headerText.setFillColor(Color{ 255, 204, 0 });
+
+    Text inputText;
+    inputText.setFont(nameMenu.font);
+    inputText.setCharacterSize(50);
+    inputText.setPosition(820, 400);
+    inputText.setFillColor(Color::White);
+
+    Text instructionText;
+    instructionText.setFont(nameMenu.font);
+    instructionText.setCharacterSize(30);
+    instructionText.setString("Press Enter to confirm, Escape to cancel");
+    instructionText.setPosition(700, 500);
+    instructionText.setFillColor(Color{ 180, 180, 180 });
+
+    std::string playerName = "";
+    bool blinkCursor = true;
+    Clock blinkClock;
+
+    nameMenu.deltaClock.restart();
+    cerr << 2 << endl;
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                {
+                    window.close();
+                    FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+                }
+
+            if (event.type == Event::KeyPressed)
+            {
+                if (event.key.code == Keyboard::Escape)
+                {
+                    // Cancel and return to previous menu
+                    return;
+                }
+                else if (event.key.code == Keyboard::Enter && !playerName.empty())
+                {
+                    // Set the player name in the Player class
+                    Player::playerName = playerName;
+                    // sound.playMenuSelect();
+                    return;
+                }
+                else if (event.key.code == Keyboard::BackSpace && !playerName.empty())
+                {
+                    playerName.pop_back();
+                    // sound.playMenuMove();
+                }
+            }
+            else if (event.type == Event::TextEntered)
+            {
+                // Accept only letters, numbers and underscore, limit to 15 characters
+                if (event.text.unicode >= 32 && event.text.unicode < 127 && playerName.length() < 15)
+                {
+                    char character = static_cast<char>(event.text.unicode);
+                    if (isalnum(character) || character == '_')
+                    {
+                        playerName += character;
+                        // sound.playMenuMove();
+                    }
+                }
+            }
+        }
+
+        // Handle cursor blinking
+        if (blinkClock.getElapsedTime().asSeconds() > 0.5f)
+        {
+            blinkCursor = !blinkCursor;
+            blinkClock.restart();
+        }
+
+        inputText.setString(playerName + (blinkCursor ? "_" : ""));
+
+        // Center the input text
+        float textWidth = inputText.getLocalBounds().width;
+        inputText.setPosition((window.getSize().x - textWidth) / 2.0f, 400);
+
+        float dt = nameMenu.deltaClock.restart().asSeconds();
+        nameMenu.updateFaces(dt);
+
+        window.clear();
+        menu_UI.back_ground(window);
+        window.draw(menu_UI.bg);
+        window.draw(headerText);
+        window.draw(inputText);
+        window.draw(instructionText);
+        
+        for (auto& p : nameMenu.pills)
+            window.draw(p);
+        window.draw(nameMenu.DownFace);
+        
+        window.display();
+    }
+}
+void Menu::changeKeyMapping(int& action, Keyboard::Key newKey, Menu& menu9) {
+	if (KeyboardKEYS::keyboardKeyToString(newKey) == "Escape")
 		return;
     if (action == 0) {
-        moveLeftKey = newKey;
+        Player::settings["moveLeftKey"] = KeyboardKEYS::keyboardKeyToString(newKey);
+        FilesController::updatePlayerSettings(Player::playerName, Player::settings);
     }
     else if (action == 1) {
-        moveRightKey = newKey;
+        Player::settings["moveRightKey"] = KeyboardKEYS::keyboardKeyToString(newKey);
+        FilesController::updatePlayerSettings(Player::playerName, Player::settings);
     }
     else if (action == 2) {
-        moveUpkey = newKey;
+        Player::settings["moveUpkey"] = KeyboardKEYS::keyboardKeyToString(newKey);
+        FilesController::updatePlayerSettings(Player::playerName, Player::settings);
     }
     else if (action == 3) {
-        moveDownkey = newKey;
+        Player::settings["moveDownkey"] = KeyboardKEYS::keyboardKeyToString(newKey);
+        FilesController::updatePlayerSettings(Player::playerName, Player::settings);
     }
 }
 
@@ -173,8 +286,6 @@ void Menu::MoveUp(int& selected, int choises)
         selected--;
         if (selected == -1)
         {
-            selected = choises - 1;
-            Face.setPosition(Face.getPosition().x, Face.getPosition().y + (positionOfFace * choises));
         }
         mainmenu[selected].setFillColor(Color{ 255,204,0 });
     }
@@ -213,7 +324,10 @@ void Menu::menu1(RenderWindow& window)
         Event evt;
         while (window.pollEvent(evt)) {
             if (evt.type == Event::Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
             if (evt.type == Event::KeyReleased)
                 pressed = false;
             if (evt.type == Event::KeyPressed && !pressed) {
@@ -292,7 +406,10 @@ void Menu::Play_menu(RenderWindow& window)
         Event evt;
         while (window.pollEvent(evt)) {
             if (evt.type == Event::Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
             if (evt.type == Event::KeyReleased)
                 pressed = false;
             if (evt.type == Event::KeyPressed && !pressed) {
@@ -371,7 +488,10 @@ void  Menu::GFX(RenderWindow& window)
         while (window.pollEvent(event))
         {
             if (event.type == event.Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
             if (event.type == Event::KeyReleased)
                 pressed = false;
             if (event.type == Event::KeyPressed && !pressed) {
@@ -483,7 +603,10 @@ void Menu::sound_options(RenderWindow& window)
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
 
             if (event.type == Event::KeyReleased)
                 pressed = false;
@@ -567,14 +690,13 @@ void Menu::sound_options(RenderWindow& window)
     }
 }
 
-void Menu::player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey)
+void Menu::player_controls(RenderWindow& window)
 {
     Menu menu9;
     menu9.Face_intilization();
     menu9.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
     menu9.choises = 5;
     menu9.mainmenu.resize(menu9.choises);
-
     float yOffset = 40.f;
     float midY = window.getSize().y * 0.5f;
 
@@ -610,7 +732,10 @@ void Menu::player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Key
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
 
             if (event.type == Event::KeyReleased)
                 pressed = false;
@@ -648,7 +773,7 @@ void Menu::player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Key
                     if (event.key.code != Keyboard::Enter)
                     {
                         int action = menu9.selected;
-                        menu9.changeKeyMapping(action, event.key.code, moveLeftKey, moveRightKey, moveUpkey, moveDownkey, menu9);
+                        menu9.changeKeyMapping(action, event.key.code, menu9);
                         draw = false;
                         waitingForKey = false;
                         pressed = true;
@@ -658,10 +783,10 @@ void Menu::player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Key
         }
 
         // Update labels with current key bindings
-        menu9.mainmenu[0].setString("Move Left : " + keyboardKeyToString(moveLeftKey));
-        menu9.mainmenu[1].setString("Move Right : " + keyboardKeyToString(moveRightKey));
-        menu9.mainmenu[2].setString("Move Up : " + keyboardKeyToString(moveUpkey));
-        menu9.mainmenu[3].setString("Move Down : " + keyboardKeyToString(moveDownkey));
+        menu9.mainmenu[0].setString("Move Left : " + Player::settings["moveLeftKey"]);
+        menu9.mainmenu[1].setString("Move Right : " + Player::settings["moveRightKey"]);
+        menu9.mainmenu[2].setString("Move Up : " + Player::settings["moveUpkey"]);
+        menu9.mainmenu[3].setString("Move Down : " + Player::settings["moveDownkey"]);
 
         float dt = menu9.deltaClock.restart().asSeconds();
         menu9.updateFaces(dt);
@@ -723,7 +848,10 @@ void Menu::options_menu(RenderWindow& window)
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
 
             if (event.type == Event::KeyReleased)
                 pressed = false;
@@ -758,7 +886,7 @@ void Menu::options_menu(RenderWindow& window)
                 {
                     if (menu4.selected == 0)  GFX(window);
                     if (menu4.selected == 1)  sound_options(window);
-                    if (menu4.selected == 2)   player_controls(window, moveLeftKey, moveRightKey, moveUpkey, moveDownkey);
+                    if (menu4.selected == 2)   player_controls(window);
                 }
             }
         }
@@ -791,7 +919,10 @@ void  Menu::credits(RenderWindow& window)
         while (window.pollEvent(event))
         {
             if (event.type == event.Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
         }
         if (Keyboard::isKeyPressed(Keyboard::Escape))
         {
@@ -817,7 +948,10 @@ void  Menu::instructions(RenderWindow& window)
         while (window.pollEvent(event))
         {
             if (event.type == event.Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
         }
         if (Keyboard::isKeyPressed(Keyboard::Escape))
         {
@@ -905,7 +1039,10 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
             if (event.type == sf::Event::KeyReleased) {
                 if (!op) {
                     if (event.key.code == sf::Keyboard::Up) {
@@ -938,6 +1075,7 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
                             window.setView(window.getDefaultView());
                             play_again = 0;
                             exit = 1;
+                            FilesController::updatePlayerSettings(Player::playerName, Player::settings);
                             return;
                         }
                     }

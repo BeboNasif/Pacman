@@ -7,31 +7,33 @@ class Menu {
 public:
     Menu();
     void menu1(RenderWindow& window);
+    void player_name_input(RenderWindow& window);
     void Play_menu(RenderWindow& window);
     void GFX(RenderWindow& window);
 	void sound_options(RenderWindow& window);
-    void player_controls(RenderWindow& window, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey);
+    void player_controls(RenderWindow& window);
     void options_menu(RenderWindow& window);
 	void credits(RenderWindow& window);
 	void instructions(RenderWindow& window);
 	void Pause(RenderWindow& window, Texture gametexture);
     bool exit = 0;
+    bool show_name_input = true;
+
 
 private:
     void updateFaces(float dt);
     void Face_intilization();
     void MoveDown(int& sel, int choices);
     void MoveUp(int& sel, int choices);
-    void changeKeyMapping(int& action, Keyboard::Key newKey, Keyboard::Key& moveLeftKey, Keyboard::Key& moveRightKey, Keyboard::Key& moveUpkey, Keyboard::Key& moveDownkey, Menu& menu9);
-    string keyboardKeyToString(sf::Keyboard::Key key);
+    void changeKeyMapping(int& action, Keyboard::Key newKey, Menu& menu9);
 
-    // ——— Menu text items ———
+    // ï¿½ï¿½ï¿½ Menu text items ï¿½ï¿½ï¿½
     vector<Text> mainmenu;
     int choises;
     int selected;
     Font font;
 
-    // ——— Face & animation ———
+    // ï¿½ï¿½ï¿½ Face & animation ï¿½ï¿½ï¿½
     vector<Texture> faceFrames;
     RectangleShape Face, DownFace;
     float downFaceSpeed;
@@ -39,7 +41,7 @@ private:
     Clock animationClock;
     Time frameDuration;
 
-    // ——— Pill logic ———
+    // ï¿½ï¿½ï¿½ Pill logic ï¿½ï¿½ï¿½
     vector<RectangleShape> pills;
     Texture pill;
     vector<bool> pillConsumed;
@@ -49,7 +51,7 @@ private:
     int eatenPills;
     bool delayStarted;
 
-    // ——— Timing & layout ———
+    // ï¿½ï¿½ï¿½ Timing & layout ï¿½ï¿½ï¿½
     Clock deltaClock;
     float positionOfFace;
 
