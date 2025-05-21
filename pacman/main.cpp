@@ -1,11 +1,13 @@
 ﻿#include <random>
-#include "Menu.h"
+#include "menu.h"
 #include "menu_Bg.h"
 #include "Player.h"
 #include "Sounds.h"
 #include "Map.h"
 #include "Ghost.h"
 #include "include.h"
+#include "FilesController.h"
+
 Map mp;
 Menu menu;
 Sounds sound;
@@ -47,6 +49,12 @@ void Gameplay() {
     vector<Ghost*> ghosts = { &redGhost, &pinkGhost, &blueGhost, &yellowGhost };
 
     Player pacman(pacmanSprite);
+    
+    cerr << "loading" << endl;
+    Player::initSettings();
+    cerr << "loading done" << endl;
+    cerr << "Player name: " << pacman.playerName << endl;
+    cerr << "max score: " << pacman.settings["maxScore"] << endl;
 
     Font fnt, fnt2;
     fnt.loadFromFile("Assets/Fonts/Freedom-10eM.ttf");
@@ -119,6 +127,12 @@ void Gameplay() {
                 window.close();
             if (event.key.code == Keyboard::Escape)
             {
+                // save the game state
+                int maxScore = stoi(Player::settings["maxScore"]);
+                if (score > maxScore) {
+                    Player::settings["maxScore"] = to_string(score);
+                }
+                cerr << score << " " << maxScore << endl;
                 sound.so2.stop();
                 pressed = true;
                 GameTexture.create(1920, 1080);
@@ -200,6 +214,11 @@ void Gameplay() {
 					sound.so2.stop();
 				    sound.dying();
                     pacman.die();
+                    int prevMaxScore = stoi(pacman.settings["maxScore"]);
+                    if (score > prevMaxScore) {
+                        pacman.settings["maxScore"] = to_string(score);
+                    }
+                    FilesController::updatePlayerSettings(Player::playerName, Player::settings);
                     timer = 0;
                 }
             }
@@ -244,13 +263,36 @@ void Gameplay() {
 
         window.display();
     }
+
+    // Update the score in player's settings if it's higher than previous max
+    if (score > stoi(pacman.settings["maxScore"])) {
+        pacman.settings["maxScore"] = to_string(score);
+    }
+    
+    // Save settings when gameplay ends
+    FilesController::updatePlayerSettings(Player::playerName, Player::settings);
 }
-
-
-
 
 int main() {
     window.setFramerateLimit(120);
+    // Show player name input menu first if it's the first time
+    if (menu.show_name_input) {
+        menu.player_name_input(window);
+    }
+    // Ensure settings file exists
+    try {
+        ifstream settingsFile("Assets/Settings.txt");
+        if (!settingsFile) {
+            ofstream createSettings("Assets/Settings.txt");
+            createSettings.close();
+        }
+    } catch (...) {
+        ofstream createSettings("Assets/Settings.txt");
+        createSettings.close();
+    }
+    
     menu.menu1(window);
-    Gameplay();
+    
+    
+    return 0;
 }
