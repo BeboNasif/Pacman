@@ -11,7 +11,7 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman");
+RenderWindow window(VideoMode(1920, 1080), "Pacman" /*, Style::Fullscreen*/);
 
 Text nodeNums[95];
 extern int character;
@@ -19,7 +19,9 @@ bool END = 1;
 extern bool pressed;
 FilesController filesController;
 int winScore;
+bool win = false;
 void Gameplay(int map_num) {
+	win = false;
 	sound.startup();
     sound.bgmusic.pause();
     Texture lives;
@@ -166,37 +168,41 @@ void Gameplay(int map_num) {
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
-            if (event.key.code == Keyboard::Escape)
-            {
-                if (score > maxScore) {
-                    Player::settings["maxScore"] = to_string(score);
-                }
-                sound.so2.stop();
-                pressed = true;
-                if (pacman.gameOver)
-                    END = 0;
-                GameTexture.create(1920, 1080);
-                GameTexture.update(window);
-                menu.Pause(window, GameTexture);
-
-                if (menu.exit)
-                {
-                    menu.exit = 0;
-                    sound.music(0);
-                    int i = 0;
-                    vector<int> starts = ghostNodeBegins[map_num];
-                    for (auto& ghost : ghosts) {
-                        
-                        ghost->reset(starts[i], mp.pos[map_num]);
-                        i++;
-                    }
-                    if (menu.play_again)
-                            Gameplay(map_num);
-                    return;
-                }
-
- 
+            if (event.type == Event::KeyReleased)
+                pressed = false;
+            if (!winScore && !map_num)
+                win = true;
+        }
+        if ((event.key.code == Keyboard::Escape && !pressed) || win)
+        {
+            if (score > maxScore) {
+                Player::settings["maxScore"] = to_string(score);
             }
+            sound.so2.stop();
+            pressed = true;
+            if (pacman.gameOver)
+                END = 0;
+            GameTexture.create(1920, 1080);
+            GameTexture.update(window);
+            menu.Pause(window, GameTexture);
+            if (menu.exit)
+            {
+                cout << "A7A\n";
+                menu.exit = 0;
+                sound.music(0);
+                int i = 0;
+                vector<int> starts = ghostNodeBegins[map_num];
+                for (auto& ghost : ghosts) {
+
+                    ghost->reset(starts[i], mp.pos[map_num]);
+                    i++;
+                }
+                if (menu.play_again)
+                    Gameplay(map_num);
+                return;
+            }
+
+
         }
 
         if (clock2.getElapsedTime().asSeconds() >= 1 && pacman.curr_state != 0) {
@@ -294,13 +300,16 @@ void Gameplay(int map_num) {
         ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
-        for (int i = 1; i <= (map_num ? 90 : 55); i++) {
-            for (auto x : skips) {
-                
-                if (i == x) i++;
+        if (!win)
+        {
+            for (int i = 1; i <= (map_num ? 90 : 55); i++) {
+                for (auto x : skips) {
+
+                    if (i == x) i++;
+                }
+                cout << endl;
+                window.draw(pacman.nodes[i]);
             }
-            cout << endl;
-            window.draw(pacman.nodes[i]);
         }
         
         for (auto& ghost : ghosts) {
@@ -317,17 +326,19 @@ void Gameplay(int map_num) {
         {
 			window.draw(livesSprite[i]);
         }
-        if (pacman.gameOver)
-        {
-            filesController.Gameover(score, maxScore);
-			if (score >= maxScore)
-                window.draw(filesController.highscoreENDsp);
-            else
-                window.draw(filesController.gameoversp);
-            window.draw(filesController.scoreText1);
-            window.draw(filesController.scoreText2);
+        if (!winScore && map_num) {
+			pacman.gameOver = true;
         }
-
+            if (pacman.gameOver)
+            {
+                filesController.Gameover(score, maxScore);
+                if (score >= maxScore)
+                    window.draw(filesController.highscoreENDsp);
+                else
+                    window.draw(filesController.gameoversp);
+                window.draw(filesController.scoreText1);
+                window.draw(filesController.scoreText2);
+            }
         window.display();
     }
 
