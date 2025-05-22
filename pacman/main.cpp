@@ -13,7 +13,7 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman" , Style::Fullscreen);
+RenderWindow window(VideoMode(1920, 1080), "Pacman" , Style::Close);
 
 Text nodeNums[95];
 extern int character;
@@ -64,7 +64,6 @@ void Gameplay(int map_num) {
     Text ScoreVal;
     Text MaxScoreVal;
     mp.init();
-    //mp.printAdjList(map_num);
 
     vector<int> ghostNodeBegins[2] = { {17,27,28,29},{34,40,41,42} };
     int idx = 0;

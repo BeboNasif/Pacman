@@ -1061,11 +1061,7 @@ void Menu::options_menu(RenderWindow& window)
 
 void  Menu::credits(RenderWindow& window)
 {
-    Texture cre;
-    cre.loadFromFile("Assets/Textures/d7k.jpg");
-    Sprite credits;
-    credits.setTexture(cre);
-    credits.scale(5, 5);
+  
     while (window.isOpen())
     {
         Event event;
@@ -1083,7 +1079,6 @@ void  Menu::credits(RenderWindow& window)
             return;
         }
         window.clear();
-        window.draw(credits);
         window.display();
     }
 }
