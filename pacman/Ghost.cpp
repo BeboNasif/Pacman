@@ -3,10 +3,12 @@
 #include <algorithm>
 #include <unordered_set>
 #include <algorithm>
+#include <array>
 #include "include.h"
 #include "Ghost.h"
 #include "Sounds.h"
 #include "Player.h"
+
 
 unordered_map<int, unordered_map<int, vector<int>>> Ghost::allPaths;
 float Ghost::timer = 0;
@@ -200,9 +202,6 @@ unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(un
 
     unordered_map<int, unordered_map<int, vector<int>>> allPaths;
 
-	// level one with BFS Search
-    //if (map_num == 0)
-    //{
         for (auto& start_pair : adjList)
         {
             int start = start_pair.first;
@@ -240,19 +239,10 @@ unordered_map<int, unordered_map<int, vector<int>>> Ghost::precomputeAllPaths(un
                 allPaths[start][end] = path;
             }
         }
-
-    //}
-
-
-	// level two with A* Search
-	//else if (map_num == 1)
-	//{
-        // ad el denya ya saad
-
-	//}
     
     return allPaths;
 }
+
 
 
 
@@ -348,6 +338,93 @@ int Ghost::Pinky(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjLi
     vector <int> takenNodes = { pacmanNode };
     return dfs(node, pacmanNode, limit, 0, adjList,takenNodes);
 
+}
+
+// a* with distance between pinky and pacman, with empty nodes weghited 1 and the rest 0
+int Ghost::PinkyHard(int pacmanNode, CircleShape nodes[], unordered_map<int, vector<int>>& adjList) {
+    cerr << "PinkyHard started from: " << currentNode << " to: " << pacmanNode << endl;
+
+    // Priority queue stores: pair< { -f_cost, g_cost, node_id }, path_vector >
+    // f_cost = g_cost + h_cost
+    priority_queue<pair<array<int, 3>, vector<int>>> pq;
+
+    int start_g_cost = 0;
+    // Ensure allPaths[currentNode] and allPaths[currentNode][pacmanNode] exist
+    int start_h_cost = (allPaths.count(currentNode) && allPaths[currentNode].count(pacmanNode)) ? allPaths[currentNode][pacmanNode].size() : 10000; // Large cost if no path
+    int start_f_cost = start_g_cost + start_h_cost;
+
+    array<int, 3> start_arr = {-start_f_cost, start_g_cost, currentNode};
+    pq.push(make_pair(start_arr, vector<int>())); // Initial path is empty
+
+    // Adjust visited array size if necessary, e.g., based on nodes.size() or max node ID
+    vector<bool> visited(100, false); // Assuming max node ID < 100 for now
+    // Or better: unordered_map<int, bool> visited;
+
+    while(!pq.empty()) {
+        // cerr << "pq size : " << pq.size() << endl;
+        array<int,3> current_state_arr = pq.top().first;
+        vector<int> current_path = pq.top().second;
+        pq.pop();
+
+        int current_g_cost = current_state_arr[1];
+        int nodeNum = current_state_arr[2];
+
+        if (visited[nodeNum]) {   continue;
+        }
+        visited[nodeNum] = true;
+
+        if (nodeNum == pacmanNode) {
+            if (current_path.empty()) {
+                 if (find(adjList[currentNode].begin(), adjList[currentNode]. end(), pacmanNode)
+                 !=adjList[currentNode].end() && current_path.empty()) return pacmanNode;
+                 return currentNode;
+            }
+            cerr <<"Path found. First step: "<< current_path[0] << endl;
+            return current_path[0];
+        }
+
+        if (!adjList.count(nodeNum)) continue;
+
+        for(auto ch : adjList[nodeNum]) {
+            if (visited[ch]) { continue;
+            }
+
+            int edge_cost;
+            if (nodes[ch].getScale().x == 0) {
+                edge_cost = 20;
+            } else {  edge_cost = 0;
+            }
+
+            int new_g_cost = current_g_cost + edge_cost;
+            int h_cost = (allPaths.count(ch) && allPaths[ch].count(pacmanNode)) ? allPaths[ch][pacmanNode].size() : 10000; // Large cost if no path info
+            int new_f_cost = new_g_cost + h_cost;
+
+            vector<int> new_path = current_path;
+            if (new_path.empty()) { new_path.push_back(ch);
+            } else { 
+                new_path.push_back(ch); }
+            
+            vector<int> path_to_child;
+            if (current_path.empty() && nodeNum == currentNode) { 
+                path_to_child.push_back(ch);
+            } else if (!current_path.empty()) {
+                path_to_child = current_path; 
+                
+            } else if (!current_path.empty() && nodeNum != currentNode) {
+                 path_to_child = current_path; }
+            vector<int> first_step_vector;
+            if (nodeNum == Ghost::currentNode) { first_step_vector.push_back(ch);
+            } else {
+                first_step_vector = current_path;  }
+
+
+            array<int, 3> child_arr = {-new_f_cost, new_g_cost, ch};
+            // cerr << "Pushing to PQ: node " << ch << " g:" << new_g_cost << " h:" << h_cost << " f:" << new_f_cost << " first_step: " << (first_step_vector.empty() ? -1 : first_step_vector[0]) << endl;
+            pq.push(make_pair(child_arr, first_step_vector));
+        }
+    }
+    cerr << "PinkyHard: No path found to pacmanNode: " << pacmanNode << " from " << currentNode << endl;
+    return currentNode;
 }
 
 
