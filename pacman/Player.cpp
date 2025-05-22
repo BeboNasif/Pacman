@@ -234,7 +234,6 @@ void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts,
             if (curr_state == dead) {
                 if (live > 0) {
                     live--;
-                    cout << live << endl;
                     resetAfterDeath();
                     int i = 0;
                     vector<int> ghostNodeBegins[2] = { {17,27,28,29},{34,40,41,42} };
@@ -245,7 +244,6 @@ void Player::updateAnimationCounter(float speedThreshold,vector<Ghost*> &ghosts,
                     }
                 }
                 else {
-                    cout << "Game Over" << endl;
                     gameOver = true;
                     return;
                 }

@@ -341,24 +341,19 @@ int Ghost::Pinky(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjLi
 }
 
 // a* with distance between pinky and pacman, with empty nodes weghited 1 and the rest 0
-int Ghost::PinkyHard(int pacmanNode, CircleShape nodes[], unordered_map<int, vector<int>>& adjList) {
+int Ghost::HardMove(int pacmanNode, CircleShape nodes[], unordered_map<int, vector<int>>& adjList, int pent) {
     cerr << "PinkyHard started from: " << currentNode << " to: " << pacmanNode << endl;
 
-    // Priority queue stores: pair< { -f_cost, g_cost, node_id }, path_vector >
-    // f_cost = g_cost + h_cost
     priority_queue<pair<array<int, 3>, vector<int>>> pq;
 
     int start_g_cost = 0;
-    // Ensure allPaths[currentNode] and allPaths[currentNode][pacmanNode] exist
     int start_h_cost = (allPaths.count(currentNode) && allPaths[currentNode].count(pacmanNode)) ? allPaths[currentNode][pacmanNode].size() : 10000; // Large cost if no path
     int start_f_cost = start_g_cost + start_h_cost;
 
     array<int, 3> start_arr = {-start_f_cost, start_g_cost, currentNode};
     pq.push(make_pair(start_arr, vector<int>())); // Initial path is empty
 
-    // Adjust visited array size if necessary, e.g., based on nodes.size() or max node ID
     vector<bool> visited(100, false); // Assuming max node ID < 100 for now
-    // Or better: unordered_map<int, bool> visited;
 
     while(!pq.empty()) {
         // cerr << "pq size : " << pq.size() << endl;
@@ -391,7 +386,7 @@ int Ghost::PinkyHard(int pacmanNode, CircleShape nodes[], unordered_map<int, vec
 
             int edge_cost;
             if (nodes[ch].getScale().x == 0) {
-                edge_cost = 20;
+                edge_cost = pent;
             } else {  edge_cost = 0;
             }
 
@@ -429,13 +424,13 @@ int Ghost::PinkyHard(int pacmanNode, CircleShape nodes[], unordered_map<int, vec
 
 
 // inky --> 2 steps ahead of pacman + blinky distance
-int Ghost::Inky(int pacmanNode, int dir, int Ad3kNode, unordered_map<int, vector<int>>& adjList)
+int Ghost::Inky(int pacmanNode, int dir, int BlinkyNode, unordered_map<int, vector<int>>& adjList)
 {
     if (allPaths[pacmanNode][currentNode].size() <= 2) {
         return pacmanNode;
     }
     int node = getNext(pacmanNode, dir);
-    int dist = allPaths[Ad3kNode][pacmanNode].size();
+    int dist = allPaths[BlinkyNode][pacmanNode].size();
     int limit = dist + 2;
     vector <int> takenNodes = { pacmanNode };
     return dfs(node, pacmanNode, limit, 0, adjList,takenNodes);
