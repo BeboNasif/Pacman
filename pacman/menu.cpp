@@ -13,9 +13,9 @@ extern Sounds sound;
 int character = 0;
 extern bool END;
 bool waitingForKey = false;
+extern bool win;
 int actionToChange;
 void Gameplay(int map_num);
-
 Menu::Menu()
     : choises(0)
     , selected(0)
@@ -34,6 +34,24 @@ Menu::Menu()
     pillDelayStarted.assign(3, false);
     pillTimers.assign(3, Clock{});
 
+}
+void Menu::reset() {
+    choises = 0;
+    selected = 0;
+    downFaceSpeed = 100.f;
+    currentFrame = 0;
+    eatenPills = 0;
+    delayStarted = false;
+    positionOfFace = 60.f;
+    frameDuration = sf::seconds(0.1f);
+
+    mainmenu.reserve(10);
+    faceFrames.reserve(3);
+    pills.reserve(3);
+
+    pillConsumed.assign(3, false);
+    pillDelayStarted.assign(3, false);
+    pillTimers.assign(3, sf::Clock{});
 }
 
 void Menu::set_sounds() {
@@ -305,6 +323,7 @@ void Menu::MoveUp(int& selected, int choises)
 
 void Menu::menu1(RenderWindow& window)
 {
+	reset();
     set_sounds();
     font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
     sound.music(0);
@@ -1002,6 +1021,7 @@ void  Menu::instructions(RenderWindow& window)
 
 void Menu::Pause(RenderWindow& window, Texture gametexture)
 {
+    END |= win;
     Menu Pause1, option;
     Pause1.choises = END + 3;
     option.choises = 3;
@@ -1097,7 +1117,16 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
                     }
                     if (event.key.code == Keyboard::Enter || (event.key.code == Keyboard::Escape && !pressed)) {
                         if (Pause1.selected == -1 + END) {
-                            return;
+                            cout << "a7777777777777a\n";
+                            if (win)
+                            {
+                                Ghost::timer = 0;
+                                Gameplay(1);
+                            }
+                            else
+                            {
+                                return;
+                            }
                         }
                         if (Pause1.selected == 0 + END) {
                             play_again = 1;
@@ -1112,7 +1141,7 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
                             play_again = 0;
                             exit = 1;
                             FilesController::updatePlayerSettings(Player::playerName, Player::settings);
-                            return;
+                            Pause1.menu1(window);
                         }
                     }
 

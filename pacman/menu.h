@@ -21,6 +21,7 @@ public:
 
 
 private:
+    void reset();
     static void set_sounds();
     void updateFaces(float dt);
     void Face_intilization();
