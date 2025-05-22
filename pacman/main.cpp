@@ -20,6 +20,7 @@ extern bool pressed;
 FilesController filesController;
 int winScore;
 bool win = false;
+float delay = 0;
 void Gameplay(int map_num) {
 	win = false;
 	sound.startup();
@@ -171,8 +172,9 @@ void Gameplay(int map_num) {
             if (event.type == Event::KeyReleased)
                 pressed = false;
         }
-        if (!winScore && !map_num) {
+        if (!winScore && !map_num && delay>=0.09) {
             win = true;
+            delay = 0;
         }
         if ((event.key.code == Keyboard::Escape && !pressed) || win)
         {
@@ -293,9 +295,10 @@ void Gameplay(int map_num) {
                 pacman.nodes[i].setScale(0, 0);
                 score += 20;
                 winScore--;
-                
             }
         }
+        if(!winScore)
+			delay += deltaTime;
         Score.setString("Score");
         ScoreVal.setString(to_string(score));
         window.clear();
@@ -326,8 +329,9 @@ void Gameplay(int map_num) {
         {
 			window.draw(livesSprite[i]);
         }
-        if (!winScore && map_num) {
+        if (!winScore && map_num &&delay>=0.16) {
 			pacman.gameOver = true;
+            delay = 0;
         }
         if (pacman.gameOver)
         {

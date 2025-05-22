@@ -41,10 +41,9 @@ public:
     static void initSettings(int map_num);
     void setDeltaTime(float dt);
     void handleInput(unordered_map<int, vector<int>>& adj, vector<pair<int, int>>& pos, int map_num);
-    void updateMovement(unordered_map<int, vector<int>> adj,vector<pair<int, int>>& pos, int map_num);
+    void updateMovement(unordered_map<int, vector<int>> adj, vector<pair<int, int>>& pos, int map_num);
     void updatePlace(Vector2f window);
-    void updateAnimation(vector<Ghost*>& ghosts,Map &mp, int map_num);
+    void updateAnimation(vector<Ghost*>& ghosts, Map& mp, int map_num);
     void die();
     int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition, int map_num);
-    void setidle();
 };
