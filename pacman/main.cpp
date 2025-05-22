@@ -11,7 +11,7 @@
 Map mp;
 Menu menu;
 Sounds sound;
-RenderWindow window(VideoMode(1920, 1080), "Pacman" /*, Style::Fullscreen*/);
+RenderWindow window(VideoMode(1920, 1080), "Pacman" , Style::Fullscreen);
 
 Text nodeNums[95];
 extern int character;
@@ -21,6 +21,7 @@ FilesController filesController;
 int winScore;
 bool win = false;
 float delay = 0;
+int tempscore = 0;
 void Gameplay(int map_num) {
 	win = false;
 	sound.startup();
@@ -172,10 +173,16 @@ void Gameplay(int map_num) {
             if (event.type == Event::KeyReleased)
                 pressed = false;
         }
-        if (!winScore && !map_num && delay>=0.09) {
+        if (!winScore && delay>=0.09) {
             win = true;
             delay = 0;
         }
+        if(!map_num)
+			tempscore = score;
+        if (map_num && (score == 0 || score == 20)) {
+			score = tempscore;
+        }
+
         if ((event.key.code == Keyboard::Escape && !pressed) || win)
         {
             if (score > maxScore) {
@@ -329,7 +336,7 @@ void Gameplay(int map_num) {
         {
 			window.draw(livesSprite[i]);
         }
-        if (!winScore && map_num &&delay>=0.16) {
+        if (!winScore && delay>=0.16) {
 			pacman.gameOver = true;
             delay = 0;
         }
@@ -337,7 +344,7 @@ void Gameplay(int map_num) {
         {
             filesController.Gameover(score, maxScore);
             window.draw(filesController.overlay);
-            if (!winScore)
+            if (win)
                 window.draw(filesController.winnersp);
             else
                 if (score >= maxScore)
@@ -368,13 +375,13 @@ int main() {
     // Ensure settings file exists
    
     try {
-        ifstream settingsFile("Settings.txt");
+        ifstream settingsFile("Assets/Settings.txt");
         if (!settingsFile) {
-            ofstream createSettings("Settings.txt");
+            ofstream createSettings("Assets/Settings.txt");
             createSettings.close();
         }
     } catch (...) {
-        ofstream createSettings("Settings.txt");
+        ofstream createSettings("Assets/Settings.txt");
         createSettings.close();
     }
    

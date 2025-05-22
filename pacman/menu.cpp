@@ -383,20 +383,22 @@ void Menu::menu1(RenderWindow& window)
                         // Ensure settings file exists
 
                         try {
-                            ifstream settingsFile("Settings.txt");
+                            ifstream settingsFile("Assets/Settings.txt");
                             if (!settingsFile) {
-                                ofstream createSettings("Settings.txt");
+                                ofstream createSettings("Assets/Settings.txt");
                                 createSettings.close();
                             }
                         }
                         catch (...) {
-                            ofstream createSettings("Settings.txt");
+                            ofstream createSettings("Assets/Settings.txt");
                             createSettings.close();
                         }
 						set_sounds();
                     }
                     if (selected == 1)
                         instructions(window);
+                    if (selected == 3)
+                        high_scores(window);
                     if (selected == 4)
                         options_menu(window);
                     if (selected == 5)
@@ -428,6 +430,104 @@ void Menu::menu1(RenderWindow& window)
         window.display();
     }
 }
+
+void Menu::high_scores(RenderWindow& window) {
+    vector<string> data = FilesController::readFile("Assets/Settings.txt");
+
+    // Parse into vector of pairs: (name, score as int)
+    vector<pair<string, int>> players;
+
+    for (const auto& line : data) {
+        if (line.empty()) continue;
+
+        size_t colon = line.find(':');
+        if (colon == string::npos) continue;
+
+        string name = line.substr(0, colon);
+        size_t scorePos = line.find("maxScore=", colon);
+        if (scorePos == string::npos) continue;
+
+        scorePos += 9;
+        size_t comma = line.find(',', scorePos);
+        string scoreStr = line.substr(scorePos, comma - scorePos);
+
+        int score = 0;
+        try {
+            score = stoi(scoreStr);
+        }
+        catch (...) {
+            score = 0; // If conversion fails, default to 0
+        }
+
+        players.emplace_back(name, score);
+    }
+
+    // Sort descending by score
+    sort(players.begin(), players.end(), [](const auto& a, const auto& b) {
+        return a.second > b.second;
+        });
+
+    // Prepare SFML texts for top 5 only
+    vector<pair<sf::Text, sf::Text>> scores;
+
+    float yOffset = 600.0f; // Starting Y position
+    int limit = min(5, (int)players.size());
+
+    for (int i = 0; i < limit; ++i) {
+        sf::Text nameText, scoreText;
+        nameText.setFont(font);
+        scoreText.setFont(font);
+
+        nameText.setString(players[i].first);
+        scoreText.setString(to_string(players[i].second));
+
+        nameText.setCharacterSize(60);
+        scoreText.setCharacterSize(60);
+
+        nameText.setFillColor(sf::Color::White);
+        scoreText.setFillColor(sf::Color::Yellow);
+
+        nameText.setPosition(700.0f, yOffset);
+        scoreText.setPosition(1100.0f, yOffset);
+
+        yOffset += 80.0f;
+
+        scores.emplace_back(nameText, scoreText);
+    }
+
+    // Main render loop (same as before)
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                FilesController::updatePlayerSettings(Player::playerName, Player::settings);
+            }
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+            pressed = true;
+            return;
+        }
+
+        float dt = deltaClock.restart().asSeconds();
+        updateFaces(dt);
+
+        window.clear();
+        menu_UI.back_ground(window);
+        window.draw(menu_UI.bg);
+        for (auto& p : pills) window.draw(p);
+        window.draw(DownFace);
+
+        for (const auto& [nameText, scoreText] : scores) {
+            window.draw(nameText);
+            window.draw(scoreText);
+        }
+
+        window.display();
+    }
+}
+
 
 void Menu::Play_menu(RenderWindow& window)
 {

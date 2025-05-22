@@ -6,6 +6,7 @@ class Menu {
 public:
     Menu();
     void menu1(RenderWindow& window);
+    void high_scores(RenderWindow& window);
     void player_name_input(RenderWindow& window);
     void Play_menu(RenderWindow& window);
     void GFX(RenderWindow& window);
