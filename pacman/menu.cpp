@@ -1149,6 +1149,8 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
         x += 100;
     }
     Pause1.mainmenu[0].setString("resume");
+    if(win)
+        Pause1.mainmenu[0].setString("Next Level");
     Pause1.mainmenu[0 + END].setString("Play Again");
     Pause1.mainmenu[1 + END].setString("Sound Option");
     Pause1.mainmenu[2 + END].setString("Exit");
