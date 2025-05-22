@@ -64,7 +64,7 @@ void Gameplay(int map_num) {
     Text ScoreVal;
     Text MaxScoreVal;
     mp.init();
-    mp.printAdjList(map_num);
+    //mp.printAdjList(map_num);
 
     vector<int> ghostNodeBegins[2] = { {17,27,28,29},{34,40,41,42} };
     int idx = 0;
@@ -239,11 +239,14 @@ void Gameplay(int map_num) {
 
             if ((!pacman.gameOver  && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
                 int target = 0;
-                if (i == 0) target = ghosts[i]->Blinky(pacmanNode);
-                if (i == 1 && map_num==0) target = ghosts[i]->Pinky(pacmanNode, pacman.curr_state, mp.adjList[map_num],ghosts[0]->currentNode);
-                if (i == 1 && map_num==1) {target = ghosts[i]->PinkyHard(pacmanNode, pacman.nodes, mp.adjList[map_num]);}
-                if (i == 2) target = ghosts[i]->Clyde(pacmanNode,map_num);
-                if (i == 3) target = ghosts[i]->Inky(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList[map_num]);
+                if (i == 0 && map_num == 0) target = ghosts[i]->Blinky(pacmanNode);
+                if (i == 0 && map_num == 1) {target = ghosts[i]->HardMove(pacmanNode, pacman.nodes, mp.adjList[map_num], 0);}
+                if (i == 1 && map_num == 0) target = ghosts[i]->Pinky(pacmanNode, pacman.curr_state, mp.adjList[map_num],ghosts[0]->currentNode);
+                if (i == 1 && map_num == 1) {target = ghosts[i]->HardMove(pacmanNode, pacman.nodes, mp.adjList[map_num], 10);}
+                if (i == 2 && map_num == 0) target = ghosts[i]->Clyde(pacmanNode,map_num);
+                if (i == 2 && map_num == 1) {target = ghosts[i]->HardMove(pacmanNode, pacman.nodes, mp.adjList[map_num], -10);}
+                if (i == 3 && map_num == 0) target = ghosts[i]->Inky(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList[map_num]);
+                if (i == 3 && map_num == 1) {target = ghosts[i]->HardMove(pacmanNode, pacman.nodes, mp.adjList[map_num], 2);}
 
                 ghosts[i]->ghostOut = 1;
 
@@ -254,13 +257,13 @@ void Gameplay(int map_num) {
                 }
                 else if (ghosts[i]->isPoisoned) {
                     target = 1 + rand() % (map_num ? 90 : 55);
-					//cout << "target is: " << target << endl;
                 }
                 ghosts[i]->update(deltaTime, mp.pos[map_num], target);
                 if (ghosts[i]->isPoisoned)
                     allAreNotPoisened = false;
             }
         }
+
         if (allAreNotPoisened)
             pacman.walk_speed = 150;
         else 

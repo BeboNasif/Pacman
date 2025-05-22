@@ -44,8 +44,8 @@ public:
     void reset(int startNode, vector<pair<int, int>>& pos);
 
     int Pinky(int pacmanNode, int dir, unordered_map<int, vector<int>>& adjList,int BlinkyNode); // pacmannode + 3
-    int PinkyHard(int pacmanNode, CircleShape nodes[], unordered_map<int, vector<int>> &adjList);
-    int Inky(int pacmanNode, int dir, int Ad3kdist, unordered_map<int, vector<int>> &adjList); // pacmannode + Blinky distance
+    int HardMove(int pacmanNode, CircleShape nodes[], unordered_map<int, vector<int>> &adjList, int pent);
+    int Inky(int pacmanNode, int dir, int BlinkyNode, unordered_map<int, vector<int>> &adjList); // pacmannode + Blinky distance
     int Clyde(int pacmanNode,int map_num); //afraid one (runs to corners when near pacman) 
     int Blinky(int pacmanNode); // red (  Blinky >:)  )
     void poisoned(const string& poisonedTexturePath);

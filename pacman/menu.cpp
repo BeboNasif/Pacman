@@ -65,7 +65,6 @@ void Menu::set_sounds() {
 
 void Menu::player_name_input(RenderWindow& window)
 {
-    cerr << 1 << endl;
     Menu nameMenu;
     nameMenu.Face_intilization();
     nameMenu.font.loadFromFile("Assets/Fonts/HalloweenSlimePersonalUse-4B80D.otf");
@@ -95,8 +94,7 @@ void Menu::player_name_input(RenderWindow& window)
     Clock blinkClock;
 
     nameMenu.deltaClock.restart();
-    cerr << 2 << endl;
-
+ 
     while (window.isOpen())
     {
         Event event;
@@ -126,6 +124,7 @@ void Menu::player_name_input(RenderWindow& window)
                 else if (event.key.code == Keyboard::BackSpace && !playerName.empty())
                 {
                     playerName.pop_back();
+     
                     // sound.playMenuMove();
                 }
             }

@@ -32,10 +32,8 @@ vector<string> FilesController::readFile(const string& filename) {
 
 map<string, map<string, string>> FilesController::getAllSettings() {
     vector<string> lines = readFile("Assets/Settings.txt");
-    cerr << "file read" << endl;
     map<string, map<string, string>> allsettings;
     for(string line : lines){
-        cerr << "processing line: " << line << endl;
         string key,value, curName;
 
         int i = 0;
@@ -59,7 +57,6 @@ map<string, map<string, string>> FilesController::getAllSettings() {
                     i++;
                 }
                 i++;
-                cerr << "key: " << key << " value: " << value << endl;
                 allsettings[curName][key] = value;
                 key.clear();
                 value.clear();
@@ -71,7 +68,6 @@ map<string, map<string, string>> FilesController::getAllSettings() {
 }
 map<string, string> FilesController::getPlayerSettings(const string playername) {
     map<string, map<string, string>> allsettings = FilesController::getAllSettings();
-    cerr << "loaded all settings" << endl;
     return allsettings[playername];
 }
 
@@ -91,7 +87,6 @@ void FilesController::updatePlayerSettings(const string playerName, const map<st
         lines.push_back(parsePlayerSettingsToText(pair.second,pair.first));
     }
     FilesController::writeFile("Assets/Settings.txt", lines);
-    cerr << "updated" << endl; 
 }
 
 
