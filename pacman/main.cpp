@@ -176,50 +176,19 @@ void Gameplay(int map_num) {
             if (event.type == Event::KeyReleased)
                 pressed = false;
         }
-        if (!winScore && delay>=0.09) {
-            win = true;
-            delay = 0;
-        }
         if(!map_num)
 			tempscore = score;
         if (map_num && (score == 0 || score == 20)) {
 			score = tempscore;
         }
 
-        if ((event.key.code == Keyboard::Escape && !pressed) || win)
-        {
-            if (score > maxScore) {
-                Player::settings["maxScore"] = to_string(score);
-            }
-            sound.so2.stop();
-            pressed = true;
-            if (pacman.gameOver)
-                END = 0;
-            GameTexture.create(1920, 1080);
-            GameTexture.update(window);
-            menu.Pause(window, GameTexture);
-            if (menu.exit)
-            {
-                menu.exit = 0;
-                sound.music(0);
-                int i = 0;
-                vector<int> starts = ghostNodeBegins[map_num];
-                for (auto& ghost : ghosts) {
-
-                    ghost->reset(starts[i], mp.pos[map_num]);
-                    i++;
-                }
-                if (menu.play_again)
-                    Gameplay(map_num);
-                return;
-            }
-
-
-        }
-
         if (clock2.getElapsedTime().asSeconds() >= 1 && pacman.curr_state != 0) {
             Ghost::timer++;
             clock2.restart();
+        }
+        if (!winScore && !map_num && delay>=0.09) {
+            win = true;
+            delay = 0;
         }
 
         if (!pacman.gameOver) {
@@ -342,7 +311,7 @@ void Gameplay(int map_num) {
         {
 			window.draw(livesSprite[i]);
         }
-        if (win && delay>=0.16) {
+        if (!winScore && map_num && delay>=0.16) {
 			pacman.gameOver = true;
             delay = 0;
         }
@@ -350,7 +319,7 @@ void Gameplay(int map_num) {
         {
             filesController.Gameover(score, maxScore);
             window.draw(filesController.overlay);
-            if (win)
+            if (!winScore)
                 window.draw(filesController.winnersp);
             else
                 if (score >= maxScore)
@@ -361,6 +330,36 @@ void Gameplay(int map_num) {
             window.draw(filesController.scoreText2);
         }
         window.display();
+        if ((event.key.code == Keyboard::Escape && !pressed) || win)
+        {
+            if (score > maxScore) {
+                Player::settings["maxScore"] = to_string(score);
+            }
+            sound.so2.stop();
+            pressed = true;
+            if (pacman.gameOver)
+                END = 0;
+            GameTexture.create(1920, 1080);
+            GameTexture.update(window);
+            menu.Pause(window, GameTexture);
+            if (menu.exit)
+            {
+                menu.exit = 0;
+                sound.music(0);
+                int i = 0;
+                vector<int> starts = ghostNodeBegins[map_num];
+                for (auto& ghost : ghosts) {
+
+                    ghost->reset(starts[i], mp.pos[map_num]);
+                    i++;
+                }
+                if (menu.play_again)
+                    Gameplay(map_num);
+                return;
+            }
+
+
+        }
     }
 
     // Update the score in player's settings if it's higher than previous max
