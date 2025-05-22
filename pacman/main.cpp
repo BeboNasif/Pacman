@@ -7,6 +7,8 @@
 #include "Ghost.h"
 #include "include.h"
 #include "FilesController.h"
+#include <chrono>
+#include <thread>
 
 Map mp;
 Menu menu;
@@ -237,7 +239,8 @@ void Gameplay(int map_num) {
             if ((!pacman.gameOver  && pacman.curr_state) && ghosts[i]->shouldUpdate(i)) {
                 int target = 0;
                 if (i == 0) target = ghosts[i]->Blinky(pacmanNode);
-                if (i == 1) target = ghosts[i]->Pinky(pacmanNode, pacman.curr_state, mp.adjList[map_num],ghosts[0]->currentNode);
+                if (i == 1 && map_num==0) target = ghosts[i]->Pinky(pacmanNode, pacman.curr_state, mp.adjList[map_num],ghosts[0]->currentNode);
+                if (i == 1 && map_num==1) {target = ghosts[i]->PinkyHard(pacmanNode, pacman.nodes, mp.adjList[map_num]);}
                 if (i == 2) target = ghosts[i]->Clyde(pacmanNode,map_num);
                 if (i == 3) target = ghosts[i]->Inky(pacmanNode, pacman.curr_state, ghosts[0]->getCurrentNode(), mp.adjList[map_num]);
 
@@ -317,8 +320,7 @@ void Gameplay(int map_num) {
 
                     if (i == x) i++;
                 }
-                cout << endl;
-                window.draw(pacman.nodes[i]);
+                    window.draw(pacman.nodes[i]);
             }
         }
         
