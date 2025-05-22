@@ -17,5 +17,7 @@
 #include <cmath>
 #include <cfloat>
 #include <set>
+#include <thread>
+#include <chrono> 
 using namespace sf;
 using namespace std;

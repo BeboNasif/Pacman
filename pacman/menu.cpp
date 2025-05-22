@@ -1117,16 +1117,13 @@ void Menu::Pause(RenderWindow& window, Texture gametexture)
                     }
                     if (event.key.code == Keyboard::Enter || (event.key.code == Keyboard::Escape && !pressed)) {
                         if (Pause1.selected == -1 + END) {
-                            cout << "a7777777777777a\n";
                             if (win)
                             {
                                 Ghost::timer = 0;
                                 Gameplay(1);
                             }
                             else
-                            {
                                 return;
-                            }
                         }
                         if (Pause1.selected == 0 + END) {
                             play_again = 1;
