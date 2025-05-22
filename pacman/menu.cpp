@@ -484,7 +484,6 @@ void Menu::Play_menu(RenderWindow& window)
                     menu2.MoveUp(menu2.selected, 3);
 
                 if (evt.key.code == Keyboard::Enter) {
-                    cout << "A7A\n";
                     if (menu2.selected == 0) Gameplay(0);
                     else if (menu2.selected == 1) Gameplay(1);
                     if (!play_again)

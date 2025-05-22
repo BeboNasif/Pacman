@@ -277,8 +277,3 @@ int Player::getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f p
     }
     return closestNode;
 }
-
-void Player::setidle() {
-    curr_state = idle;
-    tmp_state = idle;
-}
