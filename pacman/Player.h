@@ -46,5 +46,5 @@ public:
     void updateAnimation(vector<Ghost*>& ghosts,Map &mp, int map_num);
     void die();
     int getCurrentNode(std::vector<std::pair<int, int>>& pos, sf::Vector2f playerPosition, int map_num);
-
+    void setidle();
 };

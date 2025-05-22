@@ -101,6 +101,12 @@ void FilesController::Gameover(int curscore,int maxscore) {
     highscoreENDsp.setPosition(500 , 5);
     highscoreENDsp.setScale(1.7, 1.7);
 
+    winnertx.loadFromFile("Assets/Textures/winner.png");
+    winnersp.setTexture(winnertx);
+    winnersp.setPosition(500, 5);
+    winnersp.setScale(1.7, 1.7);
+
+
     gameovertx.loadFromFile("Assets/Textures/gameover0.png");
     gameoversp.setTexture(gameovertx);
     gameoversp.setPosition(500 , 10);

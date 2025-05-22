@@ -170,8 +170,9 @@ void Gameplay(int map_num) {
                 window.close();
             if (event.type == Event::KeyReleased)
                 pressed = false;
-            if (!winScore && !map_num)
-                win = true;
+        }
+        if (!winScore && !map_num) {
+            win = true;
         }
         if ((event.key.code == Keyboard::Escape && !pressed) || win)
         {
@@ -187,7 +188,6 @@ void Gameplay(int map_num) {
             menu.Pause(window, GameTexture);
             if (menu.exit)
             {
-                cout << "A7A\n";
                 menu.exit = 0;
                 sound.music(0);
                 int i = 0;
@@ -300,6 +300,7 @@ void Gameplay(int map_num) {
         ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
+        window.draw(filesController.winnersp);
         if (!win)
         {
             for (int i = 1; i <= (map_num ? 90 : 55); i++) {
@@ -329,16 +330,19 @@ void Gameplay(int map_num) {
         if (!winScore && map_num) {
 			pacman.gameOver = true;
         }
-            if (pacman.gameOver)
-            {
-                filesController.Gameover(score, maxScore);
+        if (pacman.gameOver)
+        {
+            filesController.Gameover(score, maxScore);
+            if (!winScore)
+                continue;
+            else
                 if (score >= maxScore)
                     window.draw(filesController.highscoreENDsp);
                 else
                     window.draw(filesController.gameoversp);
-                window.draw(filesController.scoreText1);
-                window.draw(filesController.scoreText2);
-            }
+            window.draw(filesController.scoreText1);
+            window.draw(filesController.scoreText2);
+        }
         window.display();
     }
 
