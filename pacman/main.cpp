@@ -300,7 +300,6 @@ void Gameplay(int map_num) {
         ScoreVal.setString(to_string(score));
         window.clear();
         window.draw(MapSprite);
-        window.draw(filesController.winnersp);
         if (!win)
         {
             for (int i = 1; i <= (map_num ? 90 : 55); i++) {
@@ -333,8 +332,9 @@ void Gameplay(int map_num) {
         if (pacman.gameOver)
         {
             filesController.Gameover(score, maxScore);
+            window.draw(filesController.overlay);
             if (!winScore)
-                continue;
+                window.draw(filesController.winnersp);
             else
                 if (score >= maxScore)
                     window.draw(filesController.highscoreENDsp);
