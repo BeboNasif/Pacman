@@ -25,6 +25,7 @@ bool win = false;
 float delay = 0;
 int tempscore = 0;
 void Gameplay(int map_num) {
+    END = 1;
 	win = false;
 	sound.startup();
     sound.bgmusic.pause();
@@ -338,7 +339,7 @@ void Gameplay(int map_num) {
         {
 			window.draw(livesSprite[i]);
         }
-        if (!winScore && delay>=0.16) {
+        if (win && delay>=0.16) {
 			pacman.gameOver = true;
             delay = 0;
         }
