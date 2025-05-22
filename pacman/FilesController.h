@@ -13,4 +13,5 @@ public:
     Sprite highscoreENDsp, gameoversp, winnersp;
     Font font;
     Text scoreText1,scoreText2;
+    RectangleShape overlay;
 };
