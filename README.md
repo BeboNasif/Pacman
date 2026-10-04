@@ -3,7 +3,7 @@
 A Pacman game written in C++ with [SFML](https://www.sfml-dev.org), built as a **Data Structures** course project. The maze is modeled as a graph, and each ghost uses a different graph algorithm to hunt the player.
 
 <!-- Add a screenshot or GIF here, e.g. ![Gameplay](docs/gameplay.png) -->
-
+![Gameplay](<img width="1919" height="1079" alt="Screenshot_2025-05-22_220748" src="https://github.com/user-attachments/assets/badf378f-5e48-425c-97b8-d3bafbc9c0d9" />)
 ---
 
 ## 📌 Table of Contents
